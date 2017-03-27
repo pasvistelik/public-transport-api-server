@@ -15,6 +15,6 @@ https://github.com/pasvistelik/myapp
 
 https://github.com/pasvistelik/myapp/blob/master/README.md
 # Клиентская часть
-https://github.com/pasvistelik/myapp/_client
+https://github.com/pasvistelik/myapp_client
 
 Client demo link: https://publictransportproject.000webhostapp.com/new/
