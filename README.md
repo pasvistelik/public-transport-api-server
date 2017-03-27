@@ -10,5 +10,11 @@ GET/ timetables Расписание движения транспорта.
 
 GET/ optimalRoute?from=:from&to=:to&startTime=:startTime&dopTimeMinutes=:dopTimeMinutes&goingSpeed=:goingSpeed&transportTypes=:transportTypes
 
-# Client demo link
-https://publictransportproject.000webhostapp.com/new/
+# Серверная часть
+https://github.com/pasvistelik/myapp
+
+https://github.com/pasvistelik/myapp/blob/master/README.md
+# Клиентская часть
+https://github.com/pasvistelik/myapp/_client
+
+Client demo link: https://publictransportproject.000webhostapp.com/new/
