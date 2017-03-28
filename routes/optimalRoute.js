@@ -18,17 +18,17 @@ function distance(a, b) {
     const earthRadius = 6372795;
     const pi180 = 0.017453;// 29251//Math.Round(Math.PI / 180, 5);
     var zz = 1, yy = 1;
-    function TaylorSin(x) {
+    function taylorSin(x) {
         yy = x * x;
         zz = x;
         return zz - (zz *= yy) / 6 + (zz *= yy) / 120;
     }
-    function TaylorCos(x) {
+    function taylorCos(x) {
         yy = x * x;
         zz = yy;
         return 1 - (yy) / 2 + (zz *= yy) / 24;
     }
-    function TaylorAtan(x) {
+    function taylorAtan(x) {
         yy = x * x;
         zz = x;
         return zz - (zz *= yy) / 3 + (zz *= yy) / 5 - (zz *= yy) / 7 + (zz *= yy) / 9 - (zz *= yy) / 20;
@@ -41,13 +41,13 @@ function distance(a, b) {
     var long2 = b.lng * pi180;
 
     // косинусы и синусы широт и разницы долгот
-    var cl1 = TaylorCos(lat1);
-    var cl2 = TaylorCos(lat2);
-    var sl1 = TaylorSin(lat1);
-    var sl2 = TaylorSin(lat2);
+    var cl1 = taylorCos(lat1);
+    var cl2 = taylorCos(lat2);
+    var sl1 = taylorSin(lat1);
+    var sl2 = taylorSin(lat2);
     var delta = long2 - long1;
-    var cdelta = TaylorCos(delta);
-    var sdelta = TaylorSin(delta);
+    var cdelta = taylorCos(delta);
+    var sdelta = taylorSin(delta);
 
     // вычислени€ длины большого круга
     var tmp = cl2 * cdelta;
@@ -55,18 +55,18 @@ function distance(a, b) {
     var x = sl1 * sl2 + cl1 * tmp;
 
     //
-    var ad = Math.atan2(y, x);//TaylorAtan(y/x);
+    var ad = Math.atan2(y, x);//taylorAtan(y/x);
     var dist = Math.ceil(ad * earthRadius);//(int)Math.Round(ad * earthRadius, 0);
 
     return dist;
 }
 
-function GetTimeForGoingTo(distance, goingSpeed) {
+function getTimeForGoingTo(distance, goingSpeed) {
     return Math.floor(distance / (goingSpeed / 3.6));
 }
 
 
-function GetStationsAround(coords, radius) {
+function getStationsAround(coords, radius) {
     var result = new Array();
     for (var i = 0, n = global.allStations.length, s = global.allStations[0]; i < n; s = global.allStations[++i]) {
         if (s != null && distance(s.coords, coords) < radius) result.push(s);
@@ -81,7 +81,7 @@ class Point {
         if (station_or_crds.hashcode != undefined) {
             this.station = station_or_crds;
             this.StationCode = station_or_crds.hashcode;
-            station_or_crds.Point = this;
+            station_or_crds.point = this;
             this.coords = station_or_crds.coords;
         }
         else {
@@ -110,7 +110,7 @@ class Point {
         }
         return false;
     }
-    Visited() {
+    setVisited() {
         this.visited = true;
     }
     toString() {
@@ -125,7 +125,7 @@ class Point {
         else p = "null";
         return /*p+" -->> */"(" + this.totalTimeSeconds + ") " + to + " (" + tr + ")"; // from " + from + " to
     }
-    TotalGoingTime() {
+    getTotalGoingTime() {
         var goingTime = 0;
         var tmpP = this;
         //this.points.Add(tmpP.ToString());
@@ -135,7 +135,7 @@ class Point {
         }
         return goingTime;
     }
-    TotalTransportChangingCount() {
+    getTotalTransportChangingCount() {
         var result = 0;
         var tmpP = this;
         //this.points.Add(tmpP.ToString());
@@ -155,10 +155,10 @@ class Points {
         this.currentSelectedPoint = null;
         //this.points = new Array();
     }
-    Find(station_or_point) {
+    findElement(station_or_point) {
         if (station_or_point.hashcode != undefined) {
             //foreach (Point p in points) if (p.Station.hashcode == station.hashcode) return p;
-            if (station_or_point.Point != null) return station_or_point.Point;
+            if (station_or_point.point != null) return station_or_point.point;
             var newCreatdPoint = new Point(2160000000, station_or_point, null, null);
             this.prototype.push(newCreatdPoint);
             return newCreatdPoint;
@@ -170,32 +170,32 @@ class Points {
             return null;
         }
     }
-    Fill(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
+    fill(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
         //foreach (Station st in stationsList)
         for (var i = 0, n = stationsList.length, st = stationsList[0]; i < n; st = stationsList[++i]) {
-            if (myIgnoringFragments != null && myIgnoringFragments.Contains(st.hashcode, null, null)) continue;
+            if (myIgnoringFragments != null && myIgnoringFragments.contains(st.hashcode, null, null)) continue;
 
             var add = new Point(2160000000, st, null, null);
-            add.tryUpdate(GetTimeForGoingTo(distance(this.startPoint.coords, st.coords), goingSpeed) + reservedTime, this.startPoint, null, null);
+            add.tryUpdate(getTimeForGoingTo(distance(this.startPoint.coords, st.coords), goingSpeed) + reservedTime, this.startPoint, null, null);
             this.prototype.push(add);
         }
     }
-    Next() {
+    getNextUnvisitedPoint() {
         //DateTime t0 = DateTime.Now;
-        if (this.currentSelectedPoint != null) this.currentSelectedPoint.Visited();
+        if (this.currentSelectedPoint != null) this.currentSelectedPoint.setVisited();
 
         //points.Sort();
 
 
         //currentSelectedPoint = points[0];
-        this.currentSelectedPoint = this.SelectPointWithMinimalMark();
+        this.currentSelectedPoint = this.selectPointWithMinimalMark();
 
         //currentSelectedPoint.currentGraph = (Points)this.Clone();
         //DEBUG_timeToCreateNext += DateTime.Now - t0;
         return this.currentSelectedPoint;
         //return currentSelectedPoint.visited ? currentSelectedPoint = null : currentSelectedPoint;
     }
-    SelectPointWithMinimalMark() {
+    selectPointWithMinimalMark() {
         var p = null;
         //foreach (Point t in points) if (!(t.visited))
         for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) if (!(t.visited)) {
@@ -206,14 +206,14 @@ class Points {
         for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) if (!(t.visited) && t.totalTimeSeconds < p.totalTimeSeconds) p = t;
         return p;
     }
-    CountShortWay(ignoringRoutes, myIgnoringFragments, time, types, speed, reservedTime) {
+    countShortWay(ignoringRoutes, myIgnoringFragments, time, types, speed, reservedTime) {
         //TimeSpan overLimitResedvedTime = TimeSpan.FromMinutes(20);
 
         //DEBUG_timeToCreateNext = new TimeSpan();
         //var t0 = DateTime.Now, t1;
         //var /*t_total = new TimeSpan(),*/ t_giversin = new TimeSpan(), t_finding_time = new TimeSpan()/*, t_upd_in_stations = new TimeSpan()*/;
         //var /*t_updating_total = new TimeSpan(),*/ t_going_check_total = new TimeSpan(), t_stations = new TimeSpan(), t_without_finding_marks = new TimeSpan();
-        for (var selectedPoint = this.Next(), selectedPointStation, selectedPointTotalTimeSeconds, selectedPointStationHashcode, selectedPointMyRoute, momentWhenComingToStation, routesOnStation, selectedPointCoords; selectedPoint != null; selectedPoint = this.Next()) {
+        for (var selectedPoint = this.getNextUnvisitedPoint(), selectedPointStation, selectedPointTotalTimeSeconds, selectedPointStationHashcode, selectedPointMyRoute, momentWhenComingToStation, routesOnStation, selectedPointCoords; selectedPoint != null; selectedPoint = this.getNextUnvisitedPoint()) {
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if ((selectedPointTotalTimeSeconds = selectedPoint.totalTimeSeconds) > this.finalPoint.totalTimeSeconds/* + overLimitResedvedTime*/) //... ѕропускаем и удал€ем, если значение метки превышает минимальное врем€ до пункта назначени€.
             {
@@ -251,10 +251,10 @@ class Points {
                         {
                             //t1 = DateTime.Now;
                             // «агружаем расписание:
-                            var table = selectedRoute.GetTimetable(selectedPointStation);//Database.GetTimetable(selectedPointStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
+                            var table = selectedRoute.getTimetable(selectedPointStation);//Database.getTimetable(selectedPointStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
                             //t_total += DateTime.Now - t1;
                             // Ѕлокируем попытку попасть указанным транспортом на указанную остановку:
-                            if (myIgnoringFragments.Contains(nextStation.hashcode/*nextCode*/, selectedRoute.hashcode, selectedPointStationHashcode)) continue;
+                            if (myIgnoringFragments.contains(nextStation.hashcode/*nextCode*/, selectedRoute.hashcode, selectedPointStationHashcode)) continue;
 
                             if (table.type == TableType.table) // ≈сли это точное расписание, то:
                             {
@@ -267,7 +267,7 @@ class Points {
 
                                 //t1 = DateTime.Now;
                                 // ѕодсчитываем, сколько будем ожидать этот транспорт на остановке:
-                                var waitingTime = table.FindTimeAfter(momentWhenAskingForGoing);
+                                var waitingTime = table.findTimeAfter(momentWhenAskingForGoing);
                                 //t_finding_time += DateTime.Now - t1;
 
                                 // ћомент, когда мы с€дем в транспорт:
@@ -277,17 +277,17 @@ class Points {
                                 Station nextStation = Database.GetStationByHashcode(nextCode, databaseMysqlConnection, canReadDataFromLocalCopy: true);*/
 
                                 // » соответствующее расписание на этой остановке:
-                                var tbl = selectedRoute.GetTimetable(nextStation);//Database.GetTimetable(nextStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
+                                var tbl = selectedRoute.getTimetable(nextStation);//Database.getTimetable(nextStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
                                 //t_total += DateTime.Now - t1;
                                 //t1 = DateTime.Now;
                                 // (сколько будем ехать до следующей остановки):
-                                var goingOnTransportTime = tbl.FindTimeAfter(momentWhenSitInTransport);
+                                var goingOnTransportTime = tbl.findTimeAfter(momentWhenSitInTransport);
                                 //t_finding_time += DateTime.Now - t1;
 
                                 // ћетка времени:
                                 var onNextPointtotalTimeSeconds = momentWhenSitInTransport - momentWhenComingToStation + goingOnTransportTime + selectedPointTotalTimeSeconds;
                                 //t1 = DateTime.Now;
-                                if (this.Find(nextStation).tryUpdate(onNextPointtotalTimeSeconds, selectedPoint, selectedPointStation, selectedRoute)) {
+                                if (this.findElement(nextStation).tryUpdate(onNextPointtotalTimeSeconds, selectedPoint, selectedPointStation, selectedRoute)) {
                                     //console.log("upd...");
                                 }
                                 //t_updating_total += DateTime.Now - t1;
@@ -312,13 +312,13 @@ class Points {
             for (var j = 0, m = this.prototype.length, p = this.prototype[0], distanceToSelectedPoint, goingTime, newTime; j < m; p = this.prototype[++j])
                 if (!p.visited && p != selectedPoint) {
                     // Ѕлокируем попытку дойти пешком до указанной остановки:
-                    if (myIgnoringFragments.Contains(p.StationCode, null, selectedPointStationHashcode)) continue;
+                    if (myIgnoringFragments.contains(p.StationCode, null, selectedPointStationHashcode)) continue;
 
                     //t1 = DateTime.Now;
                     distanceToSelectedPoint = distance(selectedPointCoords, p.coords);
                     //t_giversin += DateTime.Now - t1;
 
-                    goingTime = GetTimeForGoingTo(distanceToSelectedPoint, speed/*, true, sp*/);
+                    goingTime = getTimeForGoingTo(distanceToSelectedPoint, speed/*, true, sp*/);
 
                     newTime = selectedPointTotalTimeSeconds + goingTime + reservedTime;
                     /*if (p != myFinishPoint)*/ // newTime += reservedTime;
@@ -331,10 +331,10 @@ class Points {
             //t_going_check_total += DateTime.Now - t2;
 
             //t_without_finding_marks += DateTime.Now - t4;
-            if (myIgnoringFragments.Contains(null, null, selectedPointStationHashcode)) continue;
+            if (myIgnoringFragments.contains(null, null, selectedPointStationHashcode)) continue;
             //t1 = DateTime.Now;
 
-            var tryingNewTime = selectedPointTotalTimeSeconds + GetTimeForGoingTo(distance(selectedPointCoords, this.finalPoint.coords), speed);
+            var tryingNewTime = selectedPointTotalTimeSeconds + getTimeForGoingTo(distance(selectedPointCoords, this.finalPoint.coords), speed);
             if (this.finalPoint.tryUpdate(tryingNewTime, selectedPoint, selectedPointStation, null)) {
                 //console.log("upd: " + selectedPointStation.hashcode);
             }
@@ -352,24 +352,24 @@ class Points {
                 {
                     var previousRouteStation = r.getPreviousStation(previousPoint.station);
                     if (previousRouteStation != null) {
-                        var point = previousRouteStation.Point;
+                        var point = previousRouteStation.point;
                         if (point != null && point.visited) {
-                            var ttt = r.GetTimetable(previousRouteStation);
+                            var ttt = r.getTimetable(previousRouteStation);
                             if (ttt != null) {
                                 var ddd = time + previousPoint.totalTimeSeconds;
-                                var moment = r.GetTimetable(currentPoint.station).FindTimeAfter(ddd);
-                                var tmp_time = ttt.FindTimeBefore(ddd + moment);
+                                var moment = r.getTimetable(currentPoint.station).findTimeAfter(ddd);
+                                var tmp_time = ttt.findTimeBefore(ddd + moment);
 
                                 var momentArriveOnCurrent = previousPoint.totalTimeSeconds + moment;
                                 var momentSittingOnPrevious = momentArriveOnCurrent + tmp_time;
-                                /*bool bbb = point.myRoute != null && point.myRoute.GetTimetable(point.station) != null && point.myRoute.GetTimetable(point.station).FindTimeAfter(time + point.totalTimeSeconds) <= previousPoint.totalTimeSeconds + moment + tmp_time;
+                                /*bool bbb = point.myRoute != null && point.myRoute.getTimetable(point.station) != null && point.myRoute.getTimetable(point.station).findTimeAfter(time + point.totalTimeSeconds) <= previousPoint.totalTimeSeconds + moment + tmp_time;
                                 if (bbb)
                                 {
                                     previousPoint.myRoute = r;
                                     previousPoint.prev = point;////!bbb && point.totalTimeSeconds <= momentSittingOnPrevious &&
                             }
                             else */
-                                if (/*point.TotalGoingTime>=previousPoint.TotalGoingTime || */point.totalTimeSeconds <= previousPoint.totalTimeSeconds/* && point.TotalGoingTime <= previousPoint.TotalGoingTime*/) {
+                                if (/*point.totalGoingTime>=previousPoint.totalGoingTime || */point.totalTimeSeconds <= previousPoint.totalTimeSeconds/* && point.totalGoingTime <= previousPoint.totalGoingTime*/) {
                                     previousPoint.myRoute = r;
                                     previousPoint.prev = point;
                                 }
@@ -398,7 +398,7 @@ class IgnoringFragments {
             }
         }
     }
-    Contains(stationCode, routeCode, fromStationCode) {
+    contains(stationCode, routeCode, fromStationCode) {
         for (var i = 0, n = this.prototype.length, r = this.prototype[0]; i < n; r = this.prototype[++i]) {
             if (r.routeCode == routeCode && r.stationCode == stationCode && r.fromStationCode == fromStationCode) return true;
         }
@@ -410,7 +410,7 @@ class OptimalRoutesCollection {
     constructor() {
         this.prototype = Object.create(Array.prototype);
     }
-    GetOptimalWays() {
+    getOptimalWays() {
         var result = new Array();
         for (var i = 0, n = this.prototype.length, r = this.prototype[0]; i < n; r = this.prototype[++i]) {
             result.push(new OptimalWay(r));
@@ -440,15 +440,15 @@ class OptimalRoute {
 
         var myStartPoint = new Point(0, nowPos, null, null);
         var myFinishPoint = new Point(2160000000, needPos, null, null);
-        myFinishPoint.tryUpdate(GetTimeForGoingTo(distance(nowPos, needPos), goingSpeed) + 1200/*+ TimeSpan.FromMinutes(20)*/, myStartPoint, null, null);//!!!!!!!!!!!!!!!!!
-        //myFinishPoint.tryUpdate(GetTimeForGoingTo(GoogleApi.GetWalkingDistance(nowPos, needPos), goingSpeed), myStartPoint, null, null);
+        myFinishPoint.tryUpdate(getTimeForGoingTo(distance(nowPos, needPos), goingSpeed) + 1200/*+ TimeSpan.FromMinutes(20)*/, myStartPoint, null, null);//!!!!!!!!!!!!!!!!!
+        //myFinishPoint.tryUpdate(getTimeForGoingTo(GoogleApi.GetWalkingDistance(nowPos, needPos), goingSpeed), myStartPoint, null, null);
         var myPoints = new Points(myStartPoint, myFinishPoint);
         // ѕолучим "начальный" список станций:
-        var stationsList = GetStationsAround(myPoints.startPoint.coords, distance(myPoints.startPoint.coords, myPoints.finalPoint.coords));
-        myPoints.Fill(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
+        var stationsList = getStationsAround(myPoints.startPoint.coords, distance(myPoints.startPoint.coords, myPoints.finalPoint.coords));
+        myPoints.fill(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
 
         // Ќаходим кратчайшие пути до всех вершин:
-        myPoints.CountShortWay(this.ignoringRoutes, myIgnoringFragments, time, types, goingSpeed, reservedTimeSeconds);
+        myPoints.countShortWay(this.ignoringRoutes, myIgnoringFragments, time, types, goingSpeed, reservedTimeSeconds);
 
         var tmpP = myPoints.finalPoint;
         this.points.push(tmpP.toString());////
@@ -460,8 +460,8 @@ class OptimalRoute {
         }
 
         this.totalTimeSeconds = myPoints.finalPoint.totalTimeSeconds;
-        this.totalGoingTime = myPoints.finalPoint.TotalGoingTime();
-        this.totalTransportChangingCount = myPoints.finalPoint.TotalTransportChangingCount();
+        this.totalGoingTime = myPoints.finalPoint.getTotalGoingTime();
+        this.totalTransportChangingCount = myPoints.finalPoint.getTotalTransportChangingCount();
 
         this.myPoints = myPoints;
         this.myIgnoringFragments = myIgnoringFragments;
@@ -470,10 +470,10 @@ class OptimalRoute {
         this.visited = false;
     }
 
-    Visited() {
+    setVisited() {
         this.visited = true;
     }
-    static SelectOptimalRouteWithMinimalMark(points) {
+    static selectOptimalRouteWithMinimalMark(points) {
         var p = null;
         //foreach (OptimalRoute t in points) if (!(t.visited))
         for (var i = 0, n = points.prototype.length, t = points.prototype[0]; i < n; t = points.prototype[++i]) if (!(t.visited)) {
@@ -489,7 +489,7 @@ class OptimalRoute {
 
 
 
-    static FindOptimalRoutes(nowPos, needPos, time, types, speed, dopTimeMinutes) {
+    static findOptimalRoutes(nowPos, needPos, time, types, speed, dopTimeMinutes) {
         var findedOptimalRoutes = new OptimalRoutesCollection();
 
         findedOptimalRoutes.prototype.push(new OptimalRoute(nowPos, needPos, time, types, speed, dopTimeMinutes));
@@ -498,7 +498,7 @@ class OptimalRoute {
 
         var ignoringFragments = new IgnoringFragments();
 
-        for (var selectedOptimalRoute = findedOptimalRoutes.prototype[0]; selectedOptimalRoute != null; selectedOptimalRoute.Visited(), selectedOptimalRoute = OptimalRoute.SelectOptimalRouteWithMinimalMark(findedOptimalRoutes)) {
+        for (var selectedOptimalRoute = findedOptimalRoutes.prototype[0]; selectedOptimalRoute != null; selectedOptimalRoute.setVisited(), selectedOptimalRoute = OptimalRoute.selectOptimalRouteWithMinimalMark(findedOptimalRoutes)) {
             var ddd = 0.25;
 
             ignoringRoutes = new Array();
@@ -626,9 +626,9 @@ router.get('/', function (req, res, next) {
 
         console.log("Start finding oprimal routes. Params: " + paramsStr);
         //for (var i = 0; i < 100; i++)
-        var result = OptimalRoute.FindOptimalRoutes(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
-        findedOptimalWays = result.GetOptimalWays();
-        //console.log("\n\n"+JSON.stringify(res.GetOptimalWays()));
+        var result = OptimalRoute.findOptimalRoutes(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
+        findedOptimalWays = result.getOptimalWays();
+        //console.log("\n\n"+JSON.stringify(res.getOptimalWays()));
         console.log("Finded " + findedOptimalWays.length + " optimal routes. Time = " + (Date.now() - startInitializingMoment) + " ms.");
 
         //customizeFindedOptimalWaysStart(totalTimePercent, totalGoingTimePercent, totalTransportChangingCountPercent);

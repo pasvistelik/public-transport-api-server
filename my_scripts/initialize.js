@@ -54,7 +54,7 @@ function initialize(allStations, allRoutes, allTimetables) {
             }
             return null;
         }
-        rr.GetTimetable = function (station) {
+        rr.getTimetable = function (station) {
             for (var j = 0; j <= 1; j++) {
                 for (var i = 0, n = this.stations[j].length; i < n; i++) {
                     if (this.stations[j][i] == station) {
@@ -109,7 +109,7 @@ function initialize(allStations, allRoutes, allTimetables) {
     }
 
     for (var i = 0, n = allTimetables.length, timetable = allTimetables[0]; i < n; timetable = allTimetables[++i]) {
-        timetable.FindTimeAfter = function (time) {
+        timetable.findTimeAfter = function (time) {
             var dateTmp = new Date();
             dateTmp.setMinutes(0);
             dateTmp.setHours(0);
@@ -135,7 +135,7 @@ function initialize(allStations, allRoutes, allTimetables) {
             return 2160000000;
             //throw new Exception();
         }
-        timetable.FindTimeBefore = function (time) {
+        timetable.findTimeBefore = function (time) {
             var dateTmp = new Date();
             dateTmp.setMinutes(0);
             dateTmp.setHours(0);
