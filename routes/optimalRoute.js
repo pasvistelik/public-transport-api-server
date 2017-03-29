@@ -1,4 +1,4 @@
-var express = require('express');
+п»їvar express = require('express');
 var router = express.Router();
 
 
@@ -34,13 +34,13 @@ function distance(a, b) {
         return zz - (zz *= yy) / 3 + (zz *= yy) / 5 - (zz *= yy) / 7 + (zz *= yy) / 9 - (zz *= yy) / 20;
     }
 
-    // перевести координаты в радианы
+    // РїРµСЂРµРІРµСЃС‚Рё РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ СЂР°РґРёР°РЅС‹
     var lat1 = a.lat * pi180;
     var lat2 = b.lat * pi180;
     var long1 = a.lng * pi180;
     var long2 = b.lng * pi180;
 
-    // косинусы и синусы широт и разницы долгот
+    // РєРѕСЃРёРЅСѓСЃС‹ Рё СЃРёРЅСѓСЃС‹ С€РёСЂРѕС‚ Рё СЂР°Р·РЅРёС†С‹ РґРѕР»РіРѕС‚
     var cl1 = taylorCos(lat1);
     var cl2 = taylorCos(lat2);
     var sl1 = taylorSin(lat1);
@@ -49,7 +49,7 @@ function distance(a, b) {
     var cdelta = taylorCos(delta);
     var sdelta = taylorSin(delta);
 
-    // вычисления длины большого круга
+    // РІС‹С‡РёСЃР»РµРЅРёСЏ РґР»РёРЅС‹ Р±РѕР»СЊС€РѕРіРѕ РєСЂСѓРіР°
     var tmp = cl2 * cdelta;
     var y = Math.sqrt(cl2 * cl2 * sdelta * sdelta + (cl1 * sl2 - sl1 * tmp) * (cl1 * sl2 - sl1 * tmp));
     var x = sl1 * sl2 + cl1 * tmp;
@@ -77,51 +77,49 @@ function getStationsAround(coords, radius) {
 const TableType = { table: 1, periodic: 2 };
 
 class Point {
-    constructor(totalTimeSeconds, station_or_crds, fromWhere, r) {
+    constructor(totalTimeSeconds, station_or_crds, fromWhichStation, fromWhichRoute) {
         if (station_or_crds.hashcode != undefined) {
             this.station = station_or_crds;
-            this.StationCode = station_or_crds.hashcode;
+            this.stationCode = station_or_crds.hashcode;
             station_or_crds.point = this;
             this.coords = station_or_crds.coords;
         }
         else {
             this.coords = station_or_crds;
             this.station = null;
-            this.StationCode = null;
+            this.stationCode = null;
         }
         this.totalTimeSeconds = totalTimeSeconds;
-        this.fromWhere = fromWhere;
-        this.myRoute = r;
+        this.fromWhichStation = fromWhichStation;
+        this.fromWhichRoute = fromWhichRoute;
 
-        this.visited = false;
+        this.isVisited = false;
 
-        this.prev = null;
+        this.previousPoint = null;
     }
-    tryUpdate(totalTimeSeconds, previousPoint, fromWhere, myRoute) {
+    tryUpdate(totalTimeSeconds, previousPoint, fromWhichStation, fromWhichRoute) {
         if (totalTimeSeconds < this.totalTimeSeconds) {
-            //updatesHistory.AddLast(new Point(this));
-
-            this.myRoute = myRoute;
-            this.prev = previousPoint;
+            this.fromWhichRoute = fromWhichRoute;
+            this.previousPoint = previousPoint;
             this.totalTimeSeconds = totalTimeSeconds;
-            this.fromWhere = fromWhere;
+            this.fromWhichStation = fromWhichStation;
 
             return true;
         }
         return false;
     }
     setVisited() {
-        this.visited = true;
+        this.isVisited = true;
     }
     toString() {
         var from, to, tr, p;
-        if (this.fromWhere != null) from = this.fromWhere.name;
+        if (this.fromWhichStation != null) from = this.fromWhichStation.name;
         else from = "null";
         if (this.station != null) to = this.station.name;
         else to = "null";
-        if (this.myRoute != null) tr = this.myRoute.type + " " + this.myRoute.number + " " + this.myRoute.from + " - " + this.myRoute.to;
-        else tr = "пешком";
-        if (this.prev != null) p = this.prev.toString();
+        if (this.fromWhichRoute != null) tr = this.fromWhichRoute.type + " " + this.fromWhichRoute.number + " " + this.fromWhichRoute.from + " - " + this.fromWhichRoute.to;
+        else tr = "РїРµС€РєРѕРј";
+        if (this.previousPoint != null) p = this.previousPoint.toString();
         else p = "null";
         return /*p+" -->> */"(" + this.totalTimeSeconds + ") " + to + " (" + tr + ")"; // from " + from + " to
     }
@@ -129,9 +127,9 @@ class Point {
         var goingTime = 0;
         var tmpP = this;
         //this.points.Add(tmpP.ToString());
-        while (tmpP.prev != null) {
-            if (tmpP.myRoute == null /*&& tmpP.myRoute.hashcode == null*/) goingTime += tmpP.totalTimeSeconds - tmpP.prev.totalTimeSeconds;
-            tmpP = tmpP.prev;
+        while (tmpP.previousPoint != null) {
+            if (tmpP.fromWhichRoute == null /*&& tmpP.fromWhichRoute.hashcode == null*/) goingTime += tmpP.totalTimeSeconds - tmpP.previousPoint.totalTimeSeconds;
+            tmpP = tmpP.previousPoint;
         }
         return goingTime;
     }
@@ -139,9 +137,9 @@ class Point {
         var result = 0;
         var tmpP = this;
         //this.points.Add(tmpP.ToString());
-        while (tmpP.prev != null) {
-            if (tmpP.myRoute != null && tmpP.myRoute.hashcode != null && tmpP.myRoute != tmpP.prev.myRoute) result++;
-            tmpP = tmpP.prev;
+        while (tmpP.previousPoint != null) {
+            if (tmpP.fromWhichRoute != null && tmpP.fromWhichRoute.hashcode != null && tmpP.fromWhichRoute != tmpP.previousPoint.fromWhichRoute) result++;
+            tmpP = tmpP.previousPoint;
         }
         return result;
     }
@@ -165,13 +163,12 @@ class Points {
         }
         else {
             for (var i = 0, n = this.prototype.length, p = this.prototype[0]; i < n; p = this.prototype[++i]) {
-                if (p.coords == point.coords && p.StationCode == station_or_point.StationCode) return p;
+                if (p.coords == point.coords && p.stationCode == station_or_point.stationCode) return p;
             }
             return null;
         }
     }
     fill(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
-        //foreach (Station st in stationsList)
         for (var i = 0, n = stationsList.length, st = stationsList[0]; i < n; st = stationsList[++i]) {
             if (myIgnoringFragments != null && myIgnoringFragments.contains(st.hashcode, null, null)) continue;
 
@@ -181,116 +178,92 @@ class Points {
         }
     }
     getNextUnvisitedPoint() {
-        //DateTime t0 = DateTime.Now;
         if (this.currentSelectedPoint != null) this.currentSelectedPoint.setVisited();
 
-        //points.Sort();
-
-
-        //currentSelectedPoint = points[0];
         this.currentSelectedPoint = this.selectPointWithMinimalMark();
 
-        //currentSelectedPoint.currentGraph = (Points)this.Clone();
-        //DEBUG_timeToCreateNext += DateTime.Now - t0;
         return this.currentSelectedPoint;
-        //return currentSelectedPoint.visited ? currentSelectedPoint = null : currentSelectedPoint;
     }
     selectPointWithMinimalMark() {
         var p = null;
-        //foreach (Point t in points) if (!(t.visited))
-        for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) if (!(t.visited)) {
-            p = t;
-            break;
+        for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) {
+            if (!(t.isVisited)) {
+                p = t;
+                for (t = this.prototype[++i]; i < n; t = this.prototype[++i]) {
+                    if (!(t.isVisited) && t.totalTimeSeconds < p.totalTimeSeconds) {
+                        p = t;
+                    }
+                }
+                return p;
+            }
         }
-        if (p == null) return p;
-        for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) if (!(t.visited) && t.totalTimeSeconds < p.totalTimeSeconds) p = t;
-        return p;
+        return null;
     }
     countShortWay(ignoringRoutes, myIgnoringFragments, time, types, speed, reservedTime) {
         //TimeSpan overLimitResedvedTime = TimeSpan.FromMinutes(20);
 
-        //DEBUG_timeToCreateNext = new TimeSpan();
-        //var t0 = DateTime.Now, t1;
-        //var /*t_total = new TimeSpan(),*/ t_giversin = new TimeSpan(), t_finding_time = new TimeSpan()/*, t_upd_in_stations = new TimeSpan()*/;
-        //var /*t_updating_total = new TimeSpan(),*/ t_going_check_total = new TimeSpan(), t_stations = new TimeSpan(), t_without_finding_marks = new TimeSpan();
-        for (var selectedPoint = this.getNextUnvisitedPoint(), selectedPointStation, selectedPointTotalTimeSeconds, selectedPointStationHashcode, selectedPointMyRoute, momentWhenComingToStation, routesOnStation, selectedPointCoords; selectedPoint != null; selectedPoint = this.getNextUnvisitedPoint()) {
+        for (var selectedPoint = this.getNextUnvisitedPoint(), selectedPointStation, selectedPointTotalTimeSeconds, selectedPointStationHashcode, selectedPointFromWhichRoute, momentWhenComingToStation, routesOnStation, selectedPointCoords; selectedPoint != null; selectedPoint = this.getNextUnvisitedPoint()) {
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            if ((selectedPointTotalTimeSeconds = selectedPoint.totalTimeSeconds) > this.finalPoint.totalTimeSeconds/* + overLimitResedvedTime*/) //... Пропускаем и удаляем, если значение метки превышает минимальное время до пункта назначения.
+            if ((selectedPointTotalTimeSeconds = selectedPoint.totalTimeSeconds) > this.finalPoint.totalTimeSeconds/* + overLimitResedvedTime*/) //... РџСЂРѕРїСѓСЃРєР°РµРј Рё СѓРґР°Р»СЏРµРј, РµСЃР»Рё Р·РЅР°С‡РµРЅРёРµ РјРµС‚РєРё РїСЂРµРІС‹С€Р°РµС‚ РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РґРѕ РїСѓРЅРєС‚Р° РЅР°Р·РЅР°С‡РµРЅРёСЏ.
             {
-                //points.Remove(selectedPoint);//
                 break;
-                //continue;//
             }
-            //var t4 = DateTime.Now;
-            //var t3 = DateTime.Now;
             selectedPointStation = selectedPoint.station;
             selectedPointStationHashcode = selectedPointStation.hashcode;
-            selectedPointMyRoute = selectedPoint.myRoute;
+            selectedPointFromWhichRoute = selectedPoint.fromWhichRoute;
             if (selectedPointStation != null) {
-                // Момент, когда мы прибудем на остановку:
+                // РњРѕРјРµРЅС‚, РєРѕРіРґР° РјС‹ РїСЂРёР±СѓРґРµРј РЅР° РѕСЃС‚Р°РЅРѕРІРєСѓ:
                 momentWhenComingToStation = time + selectedPointTotalTimeSeconds;
-
-                //t1 = DateTime.Now;
-                // Загружаем маршруты, проходящие через остановку:
+                // Р—Р°РіСЂСѓР¶Р°РµРј РјР°СЂС€СЂСѓС‚С‹, РїСЂРѕС…РѕРґСЏС‰РёРµ С‡РµСЂРµР· РѕСЃС‚Р°РЅРѕРІРєСѓ:
                 routesOnStation = null;// = routesOnStation = Database.GetRoutesOnStation(selectedPointStation.hashcode, canReadDataFromLocalCopy: true);
                 if (selectedPointStation.routes != null) routesOnStation = selectedPointStation.routes;
                 else continue;
 
-                //t_total += DateTime.Now - t1;
                 for (var i = 0, n = routesOnStation.length, selectedRoute = routesOnStation[0], nextStation; i < n; selectedRoute = routesOnStation[++i]) {
                     if (ignoringRoutes != null && ignoringRoutes.includes(selectedRoute)) continue;
                     if (types.includes(selectedRoute.type)) {
-                        //t1 = DateTime.Now;
-                        // Следующая остановка у данного тран спорта:
+                        // РЎР»РµРґСѓСЋС‰Р°СЏ РѕСЃС‚Р°РЅРѕРІРєР° Сѓ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅ СЃРїРѕСЂС‚Р°:
                         nextStation = selectedRoute.getNextStation(selectedPointStation);
 
-                        /*// Код остановки, на которую попадем на данном транспорте:
+                        /*// РљРѕРґ РѕСЃС‚Р°РЅРѕРІРєРё, РЅР° РєРѕС‚РѕСЂСѓСЋ РїРѕРїР°РґРµРј РЅР° РґР°РЅРЅРѕРј С‚СЂР°РЅСЃРїРѕСЂС‚Рµ:
                         string nextCode = selectedRoute.getNextStationCodeAfter(selectedPointStation.hashcode, canReadDataFromLocalCopy: true);*/
-                        //t_total += DateTime.Now - t1;
-                        if (nextStation/*nextCode*/ != null) // Если остановка не является конечной, то:
+                        if (nextStation/*nextCode*/ != null) // Р•СЃР»Рё РѕСЃС‚Р°РЅРѕРІРєР° РЅРµ СЏРІР»СЏРµС‚СЃСЏ РєРѕРЅРµС‡РЅРѕР№, С‚Рѕ:
                         {
-                            //t1 = DateTime.Now;
-                            // Загружаем расписание:
+                            // Р—Р°РіСЂСѓР¶Р°РµРј СЂР°СЃРїРёСЃР°РЅРёРµ:
                             var table = selectedRoute.getTimetable(selectedPointStation);//Database.getTimetable(selectedPointStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
-                            //t_total += DateTime.Now - t1;
-                            // Блокируем попытку попасть указанным транспортом на указанную остановку:
+                            // Р‘Р»РѕРєРёСЂСѓРµРј РїРѕРїС‹С‚РєСѓ РїРѕРїР°СЃС‚СЊ СѓРєР°Р·Р°РЅРЅС‹Рј С‚СЂР°РЅСЃРїРѕСЂС‚РѕРј РЅР° СѓРєР°Р·Р°РЅРЅСѓСЋ РѕСЃС‚Р°РЅРѕРІРєСѓ:
                             if (myIgnoringFragments.contains(nextStation.hashcode/*nextCode*/, selectedRoute.hashcode, selectedPointStationHashcode)) continue;
 
-                            if (table.type == TableType.table) // Если это точное расписание, то:
+                            if (table.type == TableType.table) // Р•СЃР»Рё СЌС‚Рѕ С‚РѕС‡РЅРѕРµ СЂР°СЃРїРёСЃР°РЅРёРµ, С‚Рѕ:
                             {
-                                // Минимальный начальный момент, с который можно начинать ожидать посадку:
+                                // РњРёРЅРёРјР°Р»СЊРЅС‹Р№ РЅР°С‡Р°Р»СЊРЅС‹Р№ РјРѕРјРµРЅС‚, СЃ РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РЅРѕ РЅР°С‡РёРЅР°С‚СЊ РѕР¶РёРґР°С‚СЊ РїРѕСЃР°РґРєСѓ:
                                 var momentWhenAskingForGoing = momentWhenComingToStation;
 
-                                // Резервируем дополнительное время, если будем пересаживаться на другой маршрут:
+                                // Р РµР·РµСЂРІРёСЂСѓРµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РІСЂРµРјСЏ, РµСЃР»Рё Р±СѓРґРµРј РїРµСЂРµСЃР°Р¶РёРІР°С‚СЊСЃСЏ РЅР° РґСЂСѓРіРѕР№ РјР°СЂС€СЂСѓС‚:
                                 //if (selectedPoint.RouteCode == null || selectedPoint.RouteCode != selectedRoute.hashcode) momentWhenAskingForGoing += reservedTime;
-                                if (selectedPointMyRoute != null && selectedPointMyRoute != selectedRoute) momentWhenAskingForGoing += reservedTime;
+                                if (selectedPointFromWhichRoute != null && selectedPointFromWhichRoute != selectedRoute) momentWhenAskingForGoing += reservedTime;
 
-                                //t1 = DateTime.Now;
-                                // Подсчитываем, сколько будем ожидать этот транспорт на остановке:
+                                // РџРѕРґСЃС‡РёС‚С‹РІР°РµРј, СЃРєРѕР»СЊРєРѕ Р±СѓРґРµРј РѕР¶РёРґР°С‚СЊ СЌС‚РѕС‚ С‚СЂР°РЅСЃРїРѕСЂС‚ РЅР° РѕСЃС‚Р°РЅРѕРІРєРµ:
                                 var waitingTime = table.findTimeAfter(momentWhenAskingForGoing);
-                                //t_finding_time += DateTime.Now - t1;
 
-                                // Момент, когда мы сядем в транспорт:
+                                // РњРѕРјРµРЅС‚, РєРѕРіРґР° РјС‹ СЃСЏРґРµРј РІ С‚СЂР°РЅСЃРїРѕСЂС‚:
                                 var momentWhenSitInTransport = momentWhenAskingForGoing + waitingTime;
-                                //t1 = DateTime.Now;
-                                /*// Следующая остановка у данного транспорта:
+
+                                /*// РЎР»РµРґСѓСЋС‰Р°СЏ РѕСЃС‚Р°РЅРѕРІРєР° Сѓ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°:
                                 Station nextStation = Database.GetStationByHashcode(nextCode, databaseMysqlConnection, canReadDataFromLocalCopy: true);*/
 
-                                // И соответствующее расписание на этой остановке:
+                                // Р СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ СЂР°СЃРїРёСЃР°РЅРёРµ РЅР° СЌС‚РѕР№ РѕСЃС‚Р°РЅРѕРІРєРµ:
                                 var tbl = selectedRoute.getTimetable(nextStation);//Database.getTimetable(nextStation.hashcode, selectedRoute.hashcode, databaseMysqlConnection, canReadDataFromLocalCopy: true);
-                                //t_total += DateTime.Now - t1;
-                                //t1 = DateTime.Now;
-                                // (сколько будем ехать до следующей остановки):
+                                
+                                // (СЃРєРѕР»СЊРєРѕ Р±СѓРґРµРј РµС…Р°С‚СЊ РґРѕ СЃР»РµРґСѓСЋС‰РµР№ РѕСЃС‚Р°РЅРѕРІРєРё):
                                 var goingOnTransportTime = tbl.findTimeAfter(momentWhenSitInTransport);
-                                //t_finding_time += DateTime.Now - t1;
-
-                                // Метка времени:
+                                
+                                // РњРµС‚РєР° РІСЂРµРјРµРЅРё:
                                 var onNextPointtotalTimeSeconds = momentWhenSitInTransport - momentWhenComingToStation + goingOnTransportTime + selectedPointTotalTimeSeconds;
-                                //t1 = DateTime.Now;
+                                
                                 if (this.findElement(nextStation).tryUpdate(onNextPointtotalTimeSeconds, selectedPoint, selectedPointStation, selectedRoute)) {
                                     //console.log("upd...");
                                 }
-                                //t_updating_total += DateTime.Now - t1;
                             }
                             else if (table.type == TableType.periodic) {
                                 throw new NotImplementedException();
@@ -299,61 +272,48 @@ class Points {
                     }
                 }
             }
-            //t_upd_in_stations = TimeSpan.FromMilliseconds(t_updating_total.TotalMilliseconds);
-            //t_stations += DateTime.Now - t3;
             selectedPointCoords = selectedPoint.coords;
-            //t_without_finding_marks += DateTime.Now - t4;
-            // Нет смысла идти пешком "транзитом" через остановку:
-            /*//11111111111111111111111111!!!!!!!!!!!!!!!!!*/
-            if (selectedPointMyRoute == null) continue;
-            //t4 = DateTime.Now;
-            //var t2 = DateTime.Now;
-            // Попробуем пройти пешком до других "вершин":
+            // РќРµС‚ СЃРјС‹СЃР»Р° РёРґС‚Рё РїРµС€РєРѕРј "С‚СЂР°РЅР·РёС‚РѕРј" С‡РµСЂРµР· РѕСЃС‚Р°РЅРѕРІРєСѓ:
+            if (selectedPointFromWhichRoute == null) continue;
+
+            // РџРѕРїСЂРѕР±СѓРµРј РїСЂРѕР№С‚Рё РїРµС€РєРѕРј РґРѕ РґСЂСѓРіРёС… "РІРµСЂС€РёРЅ":
             for (var j = 0, m = this.prototype.length, p = this.prototype[0], distanceToSelectedPoint, goingTime, newTime; j < m; p = this.prototype[++j])
-                if (!p.visited && p != selectedPoint) {
-                    // Блокируем попытку дойти пешком до указанной остановки:
-                    if (myIgnoringFragments.contains(p.StationCode, null, selectedPointStationHashcode)) continue;
+                if (!p.isVisited && p != selectedPoint) {
+                    // Р‘Р»РѕРєРёСЂСѓРµРј РїРѕРїС‹С‚РєСѓ РґРѕР№С‚Рё РїРµС€РєРѕРј РґРѕ СѓРєР°Р·Р°РЅРЅРѕР№ РѕСЃС‚Р°РЅРѕРІРєРё:
+                    if (myIgnoringFragments.contains(p.stationCode, null, selectedPointStationHashcode)) continue;
 
-                    //t1 = DateTime.Now;
                     distanceToSelectedPoint = distance(selectedPointCoords, p.coords);
-                    //t_giversin += DateTime.Now - t1;
-
+                    
                     goingTime = getTimeForGoingTo(distanceToSelectedPoint, speed/*, true, sp*/);
 
                     newTime = selectedPointTotalTimeSeconds + goingTime + reservedTime;
                     /*if (p != myFinishPoint)*/ // newTime += reservedTime;
-                    //t1 = DateTime.Now;
+                    
                     if (p.tryUpdate(newTime, selectedPoint, selectedPointStation, null)) {
                         //console.log("upd...");
                     }
-                    //t_updating_total += DateTime.Now - t1;
                 }
-            //t_going_check_total += DateTime.Now - t2;
 
-            //t_without_finding_marks += DateTime.Now - t4;
             if (myIgnoringFragments.contains(null, null, selectedPointStationHashcode)) continue;
-            //t1 = DateTime.Now;
-
+            
             var tryingNewTime = selectedPointTotalTimeSeconds + getTimeForGoingTo(distance(selectedPointCoords, this.finalPoint.coords), speed);
             if (this.finalPoint.tryUpdate(tryingNewTime, selectedPoint, selectedPointStation, null)) {
                 //console.log("upd: " + selectedPointStation.hashcode);
             }
-            //t_updating_total += DateTime.Now - t1;
         }
 
-        //t1 = DateTime.Now;
-        // Сокращаем время ходьбы пешком до минимума и избавляемся от "бессмысленных" пересадок, сохраняя общее время неизменным:
-        var currentPoint = this.finalPoint.prev;
+        // РЎРѕРєСЂР°С‰Р°РµРј РІСЂРµРјСЏ С…РѕРґСЊР±С‹ РїРµС€РєРѕРј РґРѕ РјРёРЅРёРјСѓРјР° Рё РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ "Р±РµСЃСЃРјС‹СЃР»РµРЅРЅС‹С…" РїРµСЂРµСЃР°РґРѕРє, СЃРѕС…СЂР°РЅСЏСЏ РѕР±С‰РµРµ РІСЂРµРјСЏ РЅРµРёР·РјРµРЅРЅС‹Рј:
+        var currentPoint = this.finalPoint.previousPoint;
         while (currentPoint != this.startPoint) {
-            var r = currentPoint.myRoute;
+            var r = currentPoint.fromWhichRoute;
             if (r != null) {
-                var previousPoint = currentPoint.prev;
-                if (previousPoint != this.startPoint && previousPoint.myRoute != r) // Если на предыдущую остановку мы добрались другим транспортом, то:
+                var previousPoint = currentPoint.previousPoint;
+                if (previousPoint != this.startPoint && previousPoint.fromWhichRoute != r) // Р•СЃР»Рё РЅР° РїСЂРµРґС‹РґСѓС‰СѓСЋ РѕСЃС‚Р°РЅРѕРІРєСѓ РјС‹ РґРѕР±СЂР°Р»РёСЃСЊ РґСЂСѓРіРёРј С‚СЂР°РЅСЃРїРѕСЂС‚РѕРј, С‚Рѕ:
                 {
                     var previousRouteStation = r.getPreviousStation(previousPoint.station);
                     if (previousRouteStation != null) {
                         var point = previousRouteStation.point;
-                        if (point != null && point.visited) {
+                        if (point != null && point.isVisited) {
                             var ttt = r.getTimetable(previousRouteStation);
                             if (ttt != null) {
                                 var ddd = time + previousPoint.totalTimeSeconds;
@@ -362,23 +322,23 @@ class Points {
 
                                 var momentArriveOnCurrent = previousPoint.totalTimeSeconds + moment;
                                 var momentSittingOnPrevious = momentArriveOnCurrent + tmp_time;
-                                /*bool bbb = point.myRoute != null && point.myRoute.getTimetable(point.station) != null && point.myRoute.getTimetable(point.station).findTimeAfter(time + point.totalTimeSeconds) <= previousPoint.totalTimeSeconds + moment + tmp_time;
+                                /*bool bbb = point.fromWhichRoute != null && point.fromWhichRoute.getTimetable(point.station) != null && point.fromWhichRoute.getTimetable(point.station).findTimeAfter(time + point.totalTimeSeconds) <= previousPoint.totalTimeSeconds + moment + tmp_time;
                                 if (bbb)
                                 {
-                                    previousPoint.myRoute = r;
-                                    previousPoint.prev = point;////!bbb && point.totalTimeSeconds <= momentSittingOnPrevious &&
-                            }
-                            else */
+                                    previousPoint.fromWhichRoute = r;
+                                    previousPoint.previousPoint = point;////!bbb && point.totalTimeSeconds <= momentSittingOnPrevious &&
+                                }
+                                else */
                                 if (/*point.totalGoingTime>=previousPoint.totalGoingTime || */point.totalTimeSeconds <= previousPoint.totalTimeSeconds/* && point.totalGoingTime <= previousPoint.totalGoingTime*/) {
-                                    previousPoint.myRoute = r;
-                                    previousPoint.prev = point;
+                                    previousPoint.fromWhichRoute = r;
+                                    previousPoint.previousPoint = point;
                                 }
                             }
                         }
                     }
                 }
             }
-            currentPoint = currentPoint.prev;
+            currentPoint = currentPoint.previousPoint;
         }
     }
 
@@ -420,10 +380,10 @@ class OptimalRoutesCollection extends Array {
     selectOptimalRouteWithMinimalMark() {
         var p = null;
         for (var i = 0, n = this.length, t = this[0]; i < n; t = this[++i]) {
-            if (!(t.visited)) {
+            if (!(t.isVisited)) {
                 p = t;
                 for (t = this[++i]; i < n; t = this[++i]) {
-                    if (!(t.visited) && t.totalTimeSeconds < p.totalTimeSeconds) {
+                    if (!(t.isVisited) && t.totalTimeSeconds < p.totalTimeSeconds) {
                         p = t;
                     }
                 }
@@ -458,20 +418,20 @@ class OptimalRoute {
         myFinishPoint.tryUpdate(getTimeForGoingTo(distance(nowPos, needPos), goingSpeed) + 1200/*+ TimeSpan.FromMinutes(20)*/, myStartPoint, null, null);//!!!!!!!!!!!!!!!!!
         //myFinishPoint.tryUpdate(getTimeForGoingTo(GoogleApi.GetWalkingDistance(nowPos, needPos), goingSpeed), myStartPoint, null, null);
         var myPoints = new Points(myStartPoint, myFinishPoint);
-        // Получим "начальный" список станций:
+        // РџРѕР»СѓС‡РёРј "РЅР°С‡Р°Р»СЊРЅС‹Р№" СЃРїРёСЃРѕРє СЃС‚Р°РЅС†РёР№:
         var stationsList = getStationsAround(myPoints.startPoint.coords, distance(myPoints.startPoint.coords, myPoints.finalPoint.coords));
         myPoints.fill(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
 
-        // Находим кратчайшие пути до всех вершин:
+        // РќР°С…РѕРґРёРј РєСЂР°С‚С‡Р°Р№С€РёРµ РїСѓС‚Рё РґРѕ РІСЃРµС… РІРµСЂС€РёРЅ:
         myPoints.countShortWay(this.ignoringRoutes, myIgnoringFragments, time, types, goingSpeed, reservedTimeSeconds);
 
         var tmpP = myPoints.finalPoint;
         this.points.push(tmpP.toString());////
-        while (tmpP.prev != null) {
-            tmpP = tmpP.prev;//
+        while (tmpP.previousPoint != null) {
+            tmpP = tmpP.previousPoint;//
             this.points.push(tmpP.toString());
-            if (tmpP.prev == null && tmpP.coords != myPoints.startPoint.coords)
-                throw new Exception("Где-то удалилась часть маршрута...");
+            if (tmpP.previousPoint == null && tmpP.coords != myPoints.startPoint.coords)
+                throw new Exception("Р“РґРµ-С‚Рѕ СѓРґР°Р»РёР»Р°СЃСЊ С‡Р°СЃС‚СЊ РјР°СЂС€СЂСѓС‚Р°...");
         }
 
         this.totalTimeSeconds = myPoints.finalPoint.totalTimeSeconds;
@@ -482,11 +442,11 @@ class OptimalRoute {
         this.myIgnoringFragments = myIgnoringFragments;
 
 
-        this.visited = false;
+        this.isVisited = false;
     }
 
     setVisited() {
-        this.visited = true;
+        this.isVisited = true;
     }
 
     static findOptimalRoutes(nowPos, needPos, time, types, speed, dopTimeMinutes) {
@@ -502,9 +462,9 @@ class OptimalRoute {
             var ddd = 0.25;
 
             ignoringRoutes = new Array();
-            // Проходим по всем ребрам выбранного пути и строим новые маршруты при удалении ребер:
-            for (var tmpP = selectedOptimalRoute.myPoints.finalPoint; tmpP.prev != null; tmpP = tmpP.prev) {
-                if (tmpP.myRoute != null && !ignoringRoutes.includes(tmpP.myRoute)) ignoringRoutes.push(tmpP.myRoute);
+            // РџСЂРѕС…РѕРґРёРј РїРѕ РІСЃРµРј СЂРµР±СЂР°Рј РІС‹Р±СЂР°РЅРЅРѕРіРѕ РїСѓС‚Рё Рё СЃС‚СЂРѕРёРј РЅРѕРІС‹Рµ РјР°СЂС€СЂСѓС‚С‹ РїСЂРё СѓРґР°Р»РµРЅРёРё СЂРµР±РµСЂ:
+            for (var tmpP = selectedOptimalRoute.myPoints.finalPoint; tmpP.previousPoint != null; tmpP = tmpP.previousPoint) {
+                if (tmpP.fromWhichRoute != null && !ignoringRoutes.includes(tmpP.fromWhichRoute)) ignoringRoutes.push(tmpP.fromWhichRoute);
             }
             for (var i = 0, n = ignoringRoutes.length, r = ignoringRoutes[0]; i < n; r = ignoringRoutes[++i]) {
                 if (selectedOptimalRoute.ignoringRoutes.includes(r)) continue;
@@ -555,20 +515,20 @@ class OptimalWay {
         this.totalTransportChangingCount = optimalRoute.totalTransportChangingCount;
         this.points = new Array();
         var optRoutePoints = optimalRoute.myPoints;
-        //this.points.push(new WayPoint(optRoutePoints.startPoint.totalTimeSeconds, optRoutePoints.startPoint.station, optRoutePoints.startPoint.myRoute, optRoutePoints.startPoint.coords));
+        //this.points.push(new WayPoint(optRoutePoints.startPoint.totalTimeSeconds, optRoutePoints.startPoint.station, optRoutePoints.startPoint.fromWhichRoute, optRoutePoints.startPoint.coords));
 
         //var tmp = new Array();
-        for (var tmpP = optimalRoute.myPoints.finalPoint; tmpP/*.prev*/ != null; tmpP = tmpP.prev) {
-            this.points.push(new WayPoint(tmpP.totalTimeSeconds, tmpP.station, tmpP.myRoute, tmpP.coords));
+        for (var tmpP = optimalRoute.myPoints.finalPoint; tmpP/*.previousPoint*/ != null; tmpP = tmpP.previousPoint) {
+            this.points.push(new WayPoint(tmpP.totalTimeSeconds, tmpP.station, tmpP.fromWhichRoute, tmpP.coords));
         }
         this.points.reverse();
         //this.points.concat(tmp);
 
         /*foreach (OptimalRoute.Points.Point p in optRoutePoints)
         {
-            points.Add(new WayPoint(p.Station, p.myRoute, p.coords));
+            points.Add(new WayPoint(p.Station, p.fromWhichRoute, p.coords));
         }
-        points.Add(new WayPoint(optRoutePoints.finalPoint.Station, optRoutePoints.finalPoint.myRoute, optRoutePoints.finalPoint.coords));*/
+        points.Add(new WayPoint(optRoutePoints.finalPoint.Station, optRoutePoints.finalPoint.fromWhichRoute, optRoutePoints.finalPoint.coords));*/
     }
 
 }
