@@ -405,8 +405,8 @@ class OptimalRoute {
         this.goingSpeed = goingSpeed;
         this.time = time;
         var reservedTimeSeconds = 60 * dopTimeMinutes;
-        //if (types == null) types = new RouteType[] { RouteType.bus, RouteType.trolleybus, /*RouteType.tram, RouteType.metro, RouteType.express_bus, RouteType.marsh*/ };
-        this.types = types;//{ RouteType.bus };//
+
+        this.types = types;
 
         var myIgnoringFragments = null;
         if (ignoringList != null) myIgnoringFragments = new IgnoringFragments(ignoringList);
@@ -494,17 +494,10 @@ class OptimalRoute {
 
 class WayPoint {
     constructor(time, station, route, coords) {
-        /*try
-        {*/
-        this.time = time;//.toString();
-        this.station = station == null ? null : { hashcode: station.hashcode, name: station.name, routes: null, Coords: { lat: station.coords.lat, lng: station.coords.lng } };//station.name;//new Station(station.hashcode, station.nameRus, station.nameEn, station.nameBy, (int)(10000 * station.lat), (int)(10000 * station.lng), null, station.name); //station;
-        this.route = route == null ? null : { vehicles: [], gpsTrack: null, hashcode: route.hashcode, number: route.number, type: route.type, from: route.from, to: route.to, owner: "", stations: null, timetables: null, stationsJSON: null }//route.from + " - " + route.to//new Route(route.hashcode, JsonConvert.SerializeObject(new string[] { route.from, route.to }), JsonConvert.SerializeObject(new string[] { route.from, route.to }), JsonConvert.SerializeObject(new string[] { route.from, route.to }), JsonConvert.SerializeObject(new string[] { route.from, route.to }), null, route.number, route.type, route.owner); //route;
+        this.time = time;
+        this.station = station == null ? null : { hashcode: station.hashcode, name: station.name, routes: null, Coords: { lat: station.coords.lat, lng: station.coords.lng } };
+        this.route = route == null ? null : { vehicles: [], gpsTrack: null, hashcode: route.hashcode, number: route.number, type: route.type, from: route.from, to: route.to, owner: "", stations: null, timetables: null, stationsJSON: null }
         this.coords = coords;
-        /*}
-        catch (Exception ex)
-        {
-
-        }*/
     }
 }
 class OptimalWay {
@@ -514,20 +507,11 @@ class OptimalWay {
         this.totalTransportChangingCount = optimalRoute.totalTransportChangingCount;
         this.points = new Array();
         var optRoutePoints = optimalRoute.myPoints;
-        //this.points.push(new WayPoint(optRoutePoints.startPoint.totalTimeSeconds, optRoutePoints.startPoint.station, optRoutePoints.startPoint.fromWhichRoute, optRoutePoints.startPoint.coords));
-
-        //var tmp = new Array();
-        for (var tmpP = optimalRoute.myPoints.finalPoint; tmpP/*.previousPoint*/ != null; tmpP = tmpP.previousPoint) {
+        
+        for (var tmpP = optimalRoute.myPoints.finalPoint; tmpP != null; tmpP = tmpP.previousPoint) {
             this.points.push(new WayPoint(tmpP.totalTimeSeconds, tmpP.station, tmpP.fromWhichRoute, tmpP.coords));
         }
         this.points.reverse();
-        //this.points.concat(tmp);
-
-        /*foreach (OptimalRoute.Points.Point p in optRoutePoints)
-        {
-            points.Add(new WayPoint(p.Station, p.fromWhichRoute, p.coords));
-        }
-        points.Add(new WayPoint(optRoutePoints.finalPoint.Station, optRoutePoints.finalPoint.fromWhichRoute, optRoutePoints.finalPoint.coords));*/
     }
 
 }
@@ -538,65 +522,80 @@ class OptimalWay {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-/* GET users listing. */
 router.get('/', function (req, res, next) {
-    var findedOptimalWays = null;
-    var totalTimePercent = 1;
-    var totalGoingTimePercent = 1;
-    var totalTransportChangingCountPercent = 1;
 
-    var sortedArr = new Array();
-    var minimalTimeSeconds = 0;
-    var minimalGoingTimeSeconds = 0;
-    var minimalTransportChangingCount = 0;
-
-
-    var startInitializingMoment = Date.now();
-    //?from=53.6858,23.8315&to=53.6361,23.8630&startTime=12:46&dopTimeMinutes=2&goingSpeed=5&transportTypes=bus,trolleybus
-    var fromPosition = { lat: 53.6848, lng: 23.8402 };//{ lat: 53.6858, lng: 23.8315 };
-    var toPosition = { lat: 53.7084, lng: 23.8026 };//{ lat: 53.6361, lng: 23.8630 };//{lat : 53.7084, lng: 23.8025};//
-    var myStartTime = 46000;
-    var types = ["bus", "trolleybus"];
-    var my_speed = 5;
-    var my_dopTimeMinutes = 2;
-
-    if (global.initialized) {
-
-        var tmpMyDate = new Date();
-
-        myStartTime = hour * 3600 + minute * 60;
-        myStartTime = 18 * 3600 + 0 * 60;
-
-        myStartTime = tmpMyDate.getHours() * 3600 + (tmpMyDate.getMinutes() + 1) * 60;
-
-        var fromPositionStr = fromPosition.lat + "," + fromPosition.lng;
-        var toPositionStr = toPosition.lat + "," + toPosition.lng;
-        var typesStr = (types == null || types.length == 0) ? null : types[0];
-        for (var i = 1, n = types.length; i < n; i++) typesStr += "," + types[i];
-        var hour = Math.floor(myStartTime / 3600);
-        var minute = Math.floor((myStartTime - 3600 * hour) / 60);
-        var myStartTimeStr = hour + ":" + minute;
-
-        var paramsStr = "from=" + fromPositionStr + "&to=" + toPositionStr + "&startTime=" + myStartTimeStr + "&dopTimeMinutes=" + my_dopTimeMinutes + "&goingSpeed=" + my_speed + "&transportTypes=" + typesStr;
-
-
-
-        console.log("Start finding oprimal routes. Params: " + paramsStr);
-        //for (var i = 0; i < 100; i++)
-        var result = OptimalRoute.findOptimalRoutes(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
-        findedOptimalWays = result.getOptimalWays();
-        //console.log("\n\n"+JSON.stringify(res.getOptimalWays()));
-        console.log("Finded " + findedOptimalWays.length + " optimal routes. Time = " + (Date.now() - startInitializingMoment) + " ms.");
-
-        //customizeFindedOptimalWaysStart(totalTimePercent, totalGoingTimePercent, totalTransportChangingCountPercent);
-        //res.json(null);
-        //console.log(JSON.stringify(findedOptimalWays));
-        res.json(findedOptimalWays);
-
+    function strToCoords(str) {
+        if (str == undefined || str == null) return undefined;
+        var tmp = str.split(',');
+        var myLat = parseFloat(tmp[0]);
+        var myLng = parseFloat(tmp[1]);
+        if (myLat >= -90 && myLat <= 90 && myLng >= -180 && myLng <= 180) return { lat: myLat, lng: myLng };
+        else return undefined;
     }
-    else res.json(null);
+    function strToSeconds(str) {
+        if (str == undefined || str == null) return undefined;
+        var tmp = str.split(':');
+        var hours = parseInt(tmp[0]);
+        var minutes = parseInt(tmp[1]);
+        if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) return 3600 * hours + 60 * minutes;
+        else return undefined;
+    }
+
+    var fromPosition = strToCoords(req.query.from);
+    var toPosition = strToCoords(req.query.to);
+    var myStartTime = strToSeconds(req.query.startTime);
+
+    if (fromPosition == undefined || toPosition == undefined || myStartTime == undefined) res.json(null);
+    else {
+        var my_speed = parseFloat(req.query.goingSpeed);
+        if (my_speed == undefined || my_speed == null || my_speed <= 1) my_speed = 5;
+        var my_dopTimeMinutes = parseFloat(req.query.dopTimeMinutes);
+        if (my_dopTimeMinutes == undefined || my_dopTimeMinutes == null || my_dopTimeMinutes < 0) my_dopTimeMinutes = 2;
+
+        var types = null;
+        if (req.query.types != undefined) types = req.query.types.split(',');
+        if (types == undefined || types == null) types = ["bus", "trolleybus"];
+
+
+        var findedOptimalWays = null;
+        var totalTimePercent = 1;
+        var totalGoingTimePercent = 1;
+        var totalTransportChangingCountPercent = 1;
+
+        var sortedArr = new Array();
+        var minimalTimeSeconds = 0;
+        var minimalGoingTimeSeconds = 0;
+        var minimalTransportChangingCount = 0;
+
+
+        var startInitializingMoment = Date.now();
+
+        if (global.initialized) {
+
+            var tmpMyDate = new Date();
+
+            //var fromPositionStr = fromPosition.lat + "," + fromPosition.lng;
+            //var toPositionStr = toPosition.lat + "," + toPosition.lng;
+            //var typesStr = (types == null || types.length == 0) ? null : types[0];
+            //for (var i = 1, n = types.length; i < n; i++) typesStr += "," + types[i];
+            //var hour = Math.floor(myStartTime / 3600);
+            //var minute = Math.floor((myStartTime - 3600 * hour) / 60);
+            //var myStartTimeStr = hour + ":" + minute;
+
+            //var paramsStr = "from=" + fromPositionStr + "&to=" + toPositionStr + "&startTime=" + myStartTimeStr + "&dopTimeMinutes=" + my_dopTimeMinutes + "&goingSpeed=" + my_speed + "&transportTypes=" + typesStr;
+
+
+            //console.log("Start finding oprimal routes. Params: " + paramsStr);
+
+            var result = OptimalRoute.findOptimalRoutes(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
+            findedOptimalWays = result.getOptimalWays();
+
+            console.log("Finded " + findedOptimalWays.length + " optimal routes. Time = " + (Date.now() - startInitializingMoment) + " ms.");
+
+            res.json(findedOptimalWays);
+        }
+        else res.json(null);
+    }
 });
 
 module.exports = router;
