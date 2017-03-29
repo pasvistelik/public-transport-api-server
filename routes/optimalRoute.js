@@ -147,34 +147,32 @@ class Point {
 
 class Points {
     constructor(startPoint, finalPoint) {
-        this.prototype = Object.create(Array.prototype);
+        this.collection = new Array();
         this.startPoint = startPoint;
         this.finalPoint = finalPoint;
         this.currentSelectedPoint = null;
-        //this.points = new Array();
     }
     findElement(station_or_point) {
         if (station_or_point.hashcode != undefined) {
-            //foreach (Point p in points) if (p.Station.hashcode == station.hashcode) return p;
             if (station_or_point.point != null) return station_or_point.point;
             var newCreatdPoint = new Point(2160000000, station_or_point, null, null);
-            this.prototype.push(newCreatdPoint);
+            this.collection.push(newCreatdPoint);
             return newCreatdPoint;
         }
         else {
-            for (var i = 0, n = this.prototype.length, p = this.prototype[0]; i < n; p = this.prototype[++i]) {
+            for (var i = 0, n = this.collection.length, p = this.collection[0]; i < n; p = this.collection[++i]) {
                 if (p.coords == point.coords && p.stationCode == station_or_point.stationCode) return p;
             }
             return null;
         }
     }
-    fill(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
+    fillStartData(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
         for (var i = 0, n = stationsList.length, st = stationsList[0]; i < n; st = stationsList[++i]) {
             if (myIgnoringFragments != null && myIgnoringFragments.contains(st.hashcode, null, null)) continue;
 
             var add = new Point(2160000000, st, null, null);
             add.tryUpdate(getTimeForGoingTo(distance(this.startPoint.coords, st.coords), goingSpeed) + reservedTime, this.startPoint, null, null);
-            this.prototype.push(add);
+            this.collection.push(add);
         }
     }
     getNextUnvisitedPoint() {
@@ -186,10 +184,10 @@ class Points {
     }
     selectPointWithMinimalMark() {
         var p = null;
-        for (var i = 0, n = this.prototype.length, t = this.prototype[0]; i < n; t = this.prototype[++i]) {
+        for (var i = 0, n = this.collection.length, t = this.collection[0]; i < n; t = this.collection[++i]) {
             if (!(t.isVisited)) {
                 p = t;
-                for (t = this.prototype[++i]; i < n; t = this.prototype[++i]) {
+                for (t = this.collection[++i]; i < n; t = this.collection[++i]) {
                     if (!(t.isVisited) && t.totalTimeSeconds < p.totalTimeSeconds) {
                         p = t;
                     }
@@ -277,7 +275,7 @@ class Points {
             if (selectedPointFromWhichRoute == null) continue;
 
             // Попробуем пройти пешком до других "вершин":
-            for (var j = 0, m = this.prototype.length, p = this.prototype[0], distanceToSelectedPoint, goingTime, newTime; j < m; p = this.prototype[++j])
+            for (var j = 0, m = this.collection.length, p = this.collection[0], distanceToSelectedPoint, goingTime, newTime; j < m; p = this.collection[++j])
                 if (!p.isVisited && p != selectedPoint) {
                     // Блокируем попытку дойти пешком до указанной остановки:
                     if (myIgnoringFragments.contains(p.stationCode, null, selectedPointStationHashcode)) continue;
@@ -420,7 +418,7 @@ class OptimalRoute {
         var myPoints = new Points(myStartPoint, myFinishPoint);
         // Получим "начальный" список станций:
         var stationsList = getStationsAround(myPoints.startPoint.coords, distance(myPoints.startPoint.coords, myPoints.finalPoint.coords));
-        myPoints.fill(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
+        myPoints.fillStartData(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
 
         // Находим кратчайшие пути до всех вершин:
         myPoints.countShortWay(this.ignoringRoutes, myIgnoringFragments, time, types, goingSpeed, reservedTimeSeconds);
