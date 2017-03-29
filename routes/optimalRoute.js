@@ -406,16 +406,31 @@ class IgnoringFragments {
     }
 }
 
-class OptimalRoutesCollection {
+class OptimalRoutesCollection extends Array {
     constructor() {
-        this.prototype = Object.create(Array.prototype);
+        super();
     }
     getOptimalWays() {
         var result = new Array();
-        for (var i = 0, n = this.prototype.length, r = this.prototype[0]; i < n; r = this.prototype[++i]) {
+        for (var i = 0, n = this.length, r = this[0]; i < n; r = this[++i]) {
             result.push(new OptimalWay(r));
         }
         return result;
+    }
+    selectOptimalRouteWithMinimalMark() {
+        var p = null;
+        for (var i = 0, n = this.length, t = this[0]; i < n; t = this[++i]) {
+            if (!(t.visited)) {
+                p = t;
+                for (t = this[++i]; i < n; t = this[++i]) {
+                    if (!(t.visited) && t.totalTimeSeconds < p.totalTimeSeconds) {
+                        p = t;
+                    }
+                }
+                return p;
+            }
+        }
+        return null;
     }
 }
 
@@ -473,32 +488,17 @@ class OptimalRoute {
     setVisited() {
         this.visited = true;
     }
-    static selectOptimalRouteWithMinimalMark(points) {
-        var p = null;
-        //foreach (OptimalRoute t in points) if (!(t.visited))
-        for (var i = 0, n = points.prototype.length, t = points.prototype[0]; i < n; t = points.prototype[++i]) if (!(t.visited)) {
-            p = t;
-            break;
-        }
-        if (p == null) return p;
-
-        for (var i = 0, n = points.prototype.length, t = points.prototype[0]; i < n; t = points.prototype[++i]) if (!(t.visited) && t.totalTimeSeconds < p.totalTimeSeconds) p = t;
-
-        return p;
-    }
-
-
 
     static findOptimalRoutes(nowPos, needPos, time, types, speed, dopTimeMinutes) {
         var findedOptimalRoutes = new OptimalRoutesCollection();
 
-        findedOptimalRoutes.prototype.push(new OptimalRoute(nowPos, needPos, time, types, speed, dopTimeMinutes));
+        findedOptimalRoutes.push(new OptimalRoute(nowPos, needPos, time, types, speed, dopTimeMinutes));
 
         var ignoringRoutes = new Array();
 
         var ignoringFragments = new IgnoringFragments();
 
-        for (var selectedOptimalRoute = findedOptimalRoutes.prototype[0]; selectedOptimalRoute != null; selectedOptimalRoute.setVisited(), selectedOptimalRoute = OptimalRoute.selectOptimalRouteWithMinimalMark(findedOptimalRoutes)) {
+        for (var selectedOptimalRoute = findedOptimalRoutes[0]; selectedOptimalRoute != null; selectedOptimalRoute.setVisited(), selectedOptimalRoute = findedOptimalRoutes.selectOptimalRouteWithMinimalMark()) {
             var ddd = 0.25;
 
             ignoringRoutes = new Array();
@@ -513,17 +513,17 @@ class OptimalRoute {
                 ignoringRoutesAdd.push(r);
                 var tmpOptimalRoute = new OptimalRoute(nowPos, needPos, time, types, speed, dopTimeMinutes, ignoringRoutesAdd);
 
-                if (tmpOptimalRoute.totalTimeSeconds <= findedOptimalRoutes.prototype[0].totalTimeSeconds / ddd) {
+                if (tmpOptimalRoute.totalTimeSeconds <= findedOptimalRoutes[0].totalTimeSeconds / ddd) {
                     var tmpJSON = JSON.stringify(tmpOptimalRoute.points);
                     var ok = false;
-                    for (var j = 0, m = findedOptimalRoutes.prototype.length, opt = findedOptimalRoutes.prototype[0]; j < m; opt = findedOptimalRoutes.prototype[++j]) {
+                    for (var j = 0, m = findedOptimalRoutes.length, opt = findedOptimalRoutes[0]; j < m; opt = findedOptimalRoutes[++j]) {
                         if (JSON.stringify(opt.points) == tmpJSON) {
                             ok = true;
                             break;
                         }
                     }
                     if (ok) continue;
-                    findedOptimalRoutes.prototype.push(tmpOptimalRoute);
+                    findedOptimalRoutes.push(tmpOptimalRoute);
                 }
             }
         }
