@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 
 
-var initialize = require('./my_scripts/initialize');
+var initialize = require('./modules/initialize');
 
 var my_stations = require('./routes/stations');
 var my_routes = require('./routes/routes');
