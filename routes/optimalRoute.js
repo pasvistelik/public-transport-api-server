@@ -553,7 +553,7 @@ router.get('/', function (req, res, next) {
         if (my_dopTimeMinutes == undefined || my_dopTimeMinutes == null || my_dopTimeMinutes < 0) my_dopTimeMinutes = 2;
 
         var types = null;
-        if (req.query.types != undefined) types = req.query.types.split(',');
+        if (req.query.transportTypes != undefined) types = req.query.transportTypes.split(',');
         if (types == undefined || types == null) types = ["bus", "trolleybus"];
 
 
