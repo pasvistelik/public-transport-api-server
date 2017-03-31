@@ -1,6 +1,8 @@
 ﻿var express = require('express');
 var router = express.Router();
 
+var Point = require('../modules/point');
+
 
 
 
@@ -66,90 +68,13 @@ function getTimeForGoingTo(distance, goingSpeed) {
 }
 
 
-function getStationsAround(coords, radius) {
-    var result = new Array();
-    for (var i = 0, n = global.allStations.length, s = global.allStations[0]; i < n; s = global.allStations[++i]) {
-        if (s != null && distance(s.coords, coords) < radius) result.push(s);
-    }
-    return result;
-}
 
-const TableType = { table: 1, periodic: 2 };
-
-class Point {
-    constructor(totalTimeSeconds, station_or_crds, fromWhichStation, fromWhichRoute) {
-        if (station_or_crds.hashcode != undefined) {
-            this.station = station_or_crds;
-            this.stationCode = station_or_crds.hashcode;
-            station_or_crds.point = this;
-            this.coords = station_or_crds.coords;
-        }
-        else {
-            this.coords = station_or_crds;
-            this.station = null;
-            this.stationCode = null;
-        }
-        this.totalTimeSeconds = totalTimeSeconds;
-        this.fromWhichStation = fromWhichStation;
-        this.fromWhichRoute = fromWhichRoute;
-
-        this.isVisited = false;
-
-        this.previousPoint = null;
-    }
-    tryUpdate(totalTimeSeconds, previousPoint, fromWhichStation, fromWhichRoute) {
-        if (totalTimeSeconds < this.totalTimeSeconds) {
-            this.fromWhichRoute = fromWhichRoute;
-            this.previousPoint = previousPoint;
-            this.totalTimeSeconds = totalTimeSeconds;
-            this.fromWhichStation = fromWhichStation;
-
-            return true;
-        }
-        return false;
-    }
-    setVisited() {
-        this.isVisited = true;
-    }
-    toString() {
-        var from, to, tr, p;
-        if (this.fromWhichStation != null) from = this.fromWhichStation.name;
-        else from = "null";
-        if (this.station != null) to = this.station.name;
-        else to = "null";
-        if (this.fromWhichRoute != null) tr = this.fromWhichRoute.type + " " + this.fromWhichRoute.number + " " + this.fromWhichRoute.from + " - " + this.fromWhichRoute.to;
-        else tr = "пешком";
-        if (this.previousPoint != null) p = this.previousPoint.toString();
-        else p = "null";
-        return /*p+" -->> */"(" + this.totalTimeSeconds + ") " + to + " (" + tr + ")"; // from " + from + " to
-    }
-    getTotalGoingTime() {
-        var goingTime = 0;
-        var tmpP = this;
-        //this.points.Add(tmpP.ToString());
-        while (tmpP.previousPoint != null) {
-            if (tmpP.fromWhichRoute == null /*&& tmpP.fromWhichRoute.hashcode == null*/) goingTime += tmpP.totalTimeSeconds - tmpP.previousPoint.totalTimeSeconds;
-            tmpP = tmpP.previousPoint;
-        }
-        return goingTime;
-    }
-    getTotalTransportChangingCount() {
-        var result = 0;
-        var tmpP = this;
-        //this.points.Add(tmpP.ToString());
-        while (tmpP.previousPoint != null) {
-            if (tmpP.fromWhichRoute != null && tmpP.fromWhichRoute.hashcode != null && tmpP.fromWhichRoute != tmpP.previousPoint.fromWhichRoute) result++;
-            tmpP = tmpP.previousPoint;
-        }
-        return result;
-    }
-}
 
 class Points {
-    constructor(startPoint, finalPoint) {
+    constructor(nowPos, needPos) {
         this.collection = new Array();
-        this.startPoint = startPoint;
-        this.finalPoint = finalPoint;
+        this.startPoint = new Point(0, nowPos, null, null);
+        this.finalPoint = new Point(2160000000, needPos, null, null);
         this.currentSelectedPoint = null;
     }
     findElement(station_or_point) {
@@ -167,6 +92,7 @@ class Points {
         }
     }
     fillStartData(stationsList, goingSpeed, reservedTime, myIgnoringFragments) {
+        this.finalPoint.tryUpdate(getTimeForGoingTo(distance(this.startPoint.coords, this.finalPoint.coords), goingSpeed) + 1200/*+ TimeSpan.FromMinutes(20)*/, this.startPoint, null, null);
         for (var i = 0, n = stationsList.length, st = stationsList[0]; i < n; st = stationsList[++i]) {
             if (myIgnoringFragments != null && myIgnoringFragments.contains(st.hashcode, null, null)) continue;
 
@@ -429,6 +355,18 @@ class OptimalRoutesCollection extends Array {
     }
 }
 
+
+
+function getStationsAround(coords, radius) {
+    var result = new Array();
+    for (var i = 0, n = global.allStations.length, s = global.allStations[0]; i < n; s = global.allStations[++i]) {
+        if (s != null && distance(s.coords, coords) < radius) result.push(s);
+    }
+    return result;
+}
+
+const TableType = { table: 1, periodic: 2 };
+
 class OptimalRoute {
     constructor(nowPos, needPos, time, types, goingSpeed, dopTimeMinutes, ignoringRoutesAdd, ignoringList) {
         if (ignoringRoutesAdd != undefined && ignoringRoutesAdd != null) this.ignoringRoutes = ignoringRoutesAdd;
@@ -448,11 +386,7 @@ class OptimalRoute {
         if (ignoringList != null) myIgnoringFragments = new IgnoringFragments(ignoringList);
         else myIgnoringFragments = new IgnoringFragments();
 
-        var myStartPoint = new Point(0, nowPos, null, null);
-        var myFinishPoint = new Point(2160000000, needPos, null, null);
-        myFinishPoint.tryUpdate(getTimeForGoingTo(distance(nowPos, needPos), goingSpeed) + 1200/*+ TimeSpan.FromMinutes(20)*/, myStartPoint, null, null);//!!!!!!!!!!!!!!!!!
-        //myFinishPoint.tryUpdate(getTimeForGoingTo(GoogleApi.GetWalkingDistance(nowPos, needPos), goingSpeed), myStartPoint, null, null);
-        var myPoints = new Points(myStartPoint, myFinishPoint);
+        var myPoints = new Points(nowPos, needPos);
         // Получим "начальный" список станций:
         var stationsList = getStationsAround(myPoints.startPoint.coords, distance(myPoints.startPoint.coords, myPoints.finalPoint.coords));
         myPoints.fillStartData(stationsList, goingSpeed, reservedTimeSeconds, myIgnoringFragments);
