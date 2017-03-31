@@ -165,6 +165,14 @@ function initialize(allStations, allRoutes, allTimetables) {
         }
     }
 
+    for (var i = 0, n = allStations.length, currentStation = allStations[0]; i < n; currentStation = allStations[i]) {
+        if (currentStation.routes == undefined || currentStation.routes == null || currentStation.routes.length == 0) {
+            allStations.splice(i, 1);
+            n = allStations.length;
+        }
+        else i++;
+    }
+
     console.log("Initialized. Time = " + (Date.now() - startInitializingMoment) + " ms.");
     //console.log("\n\n" + JSON.stringify(allTimetables[0]) + "\n\n");
     //alert(distance({ lat: allStations[0].xCoord, lng: allStations[0].yCoord }, { lat: allStations[5].xCoord, lng: allStations[5].yCoord }));
@@ -226,6 +234,7 @@ console.log("Downloading stations from server...");
 var strGetStations = apiPublicTransportServer + "stations/";
 strGetStations = "json/stations.json";
 strGetStations = "https://publictransportproject.000webhostapp.com/new/json/stations.json";
+strGetStations = "http://ptp.local/json/stations.json";
 var xmlhttpStations = getXmlHttp();
 xmlhttpStations.open('GET', strGetStations, true);
 xmlhttpStations.onreadystatechange = function () {
@@ -244,6 +253,7 @@ console.log("Downloading routes from server...");
 var strGetRoutes = apiPublicTransportServer + "routes/";
 strGetRoutes = "json/routes.json";
 strGetRoutes = "https://publictransportproject.000webhostapp.com/new/json/routes.json";
+strGetRoutes = "http://ptp.local/json/routes.json";
 var xmlhttpRoutes = getXmlHttp();
 xmlhttpRoutes.open('GET', strGetRoutes, true);
 xmlhttpRoutes.onreadystatechange = function () {
@@ -262,6 +272,7 @@ console.log("Downloading timetables from server...");
 var strGetTimetables = apiPublicTransportServer + "timetables/";
 strGetTimetables = "json/timetables.json";
 strGetTimetables = "https://publictransportproject.000webhostapp.com/new/json/timetables.json";
+strGetTimetables = "http://ptp.local/json/timetables.json";
 var xmlhttpTimetables = getXmlHttp();
 xmlhttpTimetables.open('GET', strGetTimetables, true);
 xmlhttpTimetables.onreadystatechange = function () {
