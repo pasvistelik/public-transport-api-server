@@ -1,4 +1,4 @@
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var fetch = require('node-fetch');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initailize.
@@ -196,23 +196,6 @@ function initialize(allStations, allRoutes, allTimetables) {
 // Load data.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function getXmlHttp() {
-    var xmlhttp;
-    try {
-        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-    } catch (e) {
-        try {
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        } catch (E) {
-            xmlhttp = false;
-        }
-    }
-    if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
-        xmlhttp = new XMLHttpRequest();
-    }
-    return xmlhttp;
-}
-
 global.allStations = null
 //var allStations = global.allStations;
 global.allRoutes = null;
@@ -233,57 +216,45 @@ console.log("Downloading stations from server...");
 var strGetStations = apiPublicTransportServer + "stations/";
 strGetStations = "json/stations.json";
 strGetStations = "https://publictransportproject.000webhostapp.com/new/json/stations.json";
-strGetStations = "http://ptp.local/json/stations.json";
-var xmlhttpStations = getXmlHttp();
-xmlhttpStations.open('GET', strGetStations, true);
-xmlhttpStations.onreadystatechange = function () {
-    if (xmlhttpStations.readyState == 4) {
-        if (xmlhttpStations.status == 200) {
-            global.allStations = JSON.parse(global.allStationsJSON = xmlhttpStations.responseText);
-            global.allStationsLoaded = true;
-            console.log("Stations loaded from server.");
-        }
-    }
-};
-xmlhttpStations.send(null);
+//strGetStations = "http://ptp.local/json/stations.json";
+fetch(strGetStations).then(function (response) {
+    response.text().then(function (data) {
+        global.allStations = JSON.parse(global.allStationsJSON = data);
+        global.allStationsLoaded = true;
+        console.log("Stations loaded from server.");
+    });
+});
 
 
 console.log("Downloading routes from server...");
 var strGetRoutes = apiPublicTransportServer + "routes/";
 strGetRoutes = "json/routes.json";
 strGetRoutes = "https://publictransportproject.000webhostapp.com/new/json/routes.json";
-strGetRoutes = "http://ptp.local/json/routes.json";
-var xmlhttpRoutes = getXmlHttp();
-xmlhttpRoutes.open('GET', strGetRoutes, true);
-xmlhttpRoutes.onreadystatechange = function () {
-    if (xmlhttpRoutes.readyState == 4) {
-        if (xmlhttpRoutes.status == 200) {
-            global.allRoutes = JSON.parse(global.allRoutesJSON = xmlhttpRoutes.responseText);
-            global.allRoutesLoaded = true;
-            console.log("Routes loaded from server.");
-        }
-    }
-};
-xmlhttpRoutes.send(null);
+//strGetRoutes = "http://ptp.local/json/routes.json";
+fetch(strGetRoutes).then(function (response) {
+    response.text().then(function (data) {
+        global.allRoutes = JSON.parse(global.allRoutesJSON = data);
+        global.allRoutesLoaded = true;
+        console.log("Routes loaded from server.");
+    });
+});
+
 
 
 console.log("Downloading timetables from server...");
 var strGetTimetables = apiPublicTransportServer + "timetables/";
 strGetTimetables = "json/timetables.json";
 strGetTimetables = "https://publictransportproject.000webhostapp.com/new/json/timetables.json";
-strGetTimetables = "http://ptp.local/json/timetables.json";
-var xmlhttpTimetables = getXmlHttp();
-xmlhttpTimetables.open('GET', strGetTimetables, true);
-xmlhttpTimetables.onreadystatechange = function () {
-    if (xmlhttpTimetables.readyState == 4) {
-        if (xmlhttpTimetables.status == 200) {
-            global.allTimetables = JSON.parse(global.allTimetablesJSON = xmlhttpTimetables.responseText);
-            global.allTimetablesLoaded = true;
-            console.log("Timetables loaded from server.");
-        }
-    }
-};
-xmlhttpTimetables.send(null);
+//strGetTimetables = "http://ptp.local/json/timetables.json";
+fetch(strGetTimetables).then(function (response) {
+    response.text().then(function (data) {
+        global.allTimetables = JSON.parse(global.allTimetablesJSON = data);
+        global.allTimetablesLoaded = true;
+        console.log("Timetables loaded from server.");
+    });
+});
+
+
 
 function loadData() {
     if (global.allStationsLoaded && global.allRoutesLoaded && global.allTimetablesLoaded) {
