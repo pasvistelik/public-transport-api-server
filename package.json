@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "build": "rimraf build/ && babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./*.cmd,./*.ini --copy-files",
+    "start": "npm run build && node build/bin/www"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -17,6 +18,10 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
-    "babel-preset-env": "^1.3.2"
+    "babel-preset-env": "^1.3.2",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-polyfill": "^6.23.0",
+    "rimraf": "^2.6.1"
   }
 }
