@@ -7,7 +7,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 
-import initialize from './modules/initialize';
+import DataProvider from './modules/public-transport-server-code/dataProvider';
+DataProvider.loadDataAndInitialize();
 
 import my_stations from './routes/stations';
 import my_routes from './routes/routes';

@@ -1,12 +1,13 @@
 ﻿import express from 'express';
 var router = express.Router();
 
-var OptimalRoutesCollection = require('../modules/optimalRoutesCollection');
-//import OptimalRoutesCollection from 'optimalRoutesCollection';
+import DataProvider from '../modules/public-transport-server-code/dataProvider';
+import AppServer from '../modules/public-transport-server-code/server';
 
 
-router.get('/', function (req, res, next) {
-
+router.get('/', async function (req, res, next) {
+    await DataProvider.loadDataAndInitialize();
+    
     function strToCoords(str) {
         if (str == undefined || str == null) return undefined;
         var tmp = str.split(',');
@@ -41,31 +42,33 @@ router.get('/', function (req, res, next) {
 
         var startInitializingMoment = Date.now();
 
-        if (global.initialized) {
+        //if (global.initialized) {
 
-            var tmpMyDate = new Date();
+        var tmpMyDate = new Date();
 
-            //var fromPositionStr = fromPosition.lat + "," + fromPosition.lng;
-            //var toPositionStr = toPosition.lat + "," + toPosition.lng;
-            //var typesStr = (types == null || types.length == 0) ? null : types[0];
-            //for (var i = 1, n = types.length; i < n; i++) typesStr += "," + types[i];
-            //var hour = Math.floor(myStartTime / 3600);
-            //var minute = Math.floor((myStartTime - 3600 * hour) / 60);
-            //var myStartTimeStr = hour + ":" + minute;
+        var fromPositionStr = fromPosition.lat + "," + fromPosition.lng;
+        var toPositionStr = toPosition.lat + "," + toPosition.lng;
+        var typesStr = (types == null || types.length == 0) ? null : types[0];
+        for (var i = 1, n = types.length; i < n; i++) typesStr += "," + types[i];
+        var hour = Math.floor(myStartTime / 3600);
+        var minute = Math.floor((myStartTime - 3600 * hour) / 60);
+        var myStartTimeStr = hour + ":" + minute;
 
-            //var paramsStr = "from=" + fromPositionStr + "&to=" + toPositionStr + "&startTime=" + myStartTimeStr + "&dopTimeMinutes=" + my_dopTimeMinutes + "&goingSpeed=" + my_speed + "&transportTypes=" + typesStr;
+        //var paramsStr = "from=" + fromPositionStr + "&to=" + toPositionStr + "&startTime=" + myStartTimeStr + "&dopTimeMinutes=" + my_dopTimeMinutes + "&goingSpeed=" + my_speed + "&transportTypes=" + typesStr;
 
 
-            //console.log("Start finding oprimal routes. Params: " + paramsStr);
+        //console.log("Start finding oprimal routes. Params: " + paramsStr);
 
-            var result = new OptimalRoutesCollection(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
-            var findedOptimalWays = result.getOptimalWays();
+        //var result = new OptimalRoutesCollection(fromPosition, toPosition, myStartTime, types, my_speed, my_dopTimeMinutes);
+        
+        
+        var findedOptimalWays = await AppServer.findWays(fromPositionStr, toPositionStr, myStartTimeStr, my_dopTimeMinutes, my_speed, typesStr);
 
-            console.log("Finded " + findedOptimalWays.length + " optimal routes. Time = " + (Date.now() - startInitializingMoment) + " ms.");
+        console.log("Finded " + findedOptimalWays.length + " optimal routes. Time = " + (Date.now() - startInitializingMoment) + " ms.");
 
-            res.json(findedOptimalWays);
-        }
-        else res.json(null);
+        res.json(findedOptimalWays);
+        //}
+        //else res.json(null);
     }
 });
 

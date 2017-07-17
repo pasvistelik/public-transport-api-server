@@ -28,9 +28,9 @@ var _cors = require('cors');
 
 var _cors2 = _interopRequireDefault(_cors);
 
-var _initialize = require('./modules/initialize');
+var _dataProvider = require('./modules/public-transport-server-code/dataProvider');
 
-var _initialize2 = _interopRequireDefault(_initialize);
+var _dataProvider2 = _interopRequireDefault(_dataProvider);
 
 var _stations = require('./routes/stations');
 
@@ -49,6 +49,8 @@ var _optimalRoute = require('./routes/optimalRoute');
 var _optimalRoute2 = _interopRequireDefault(_optimalRoute);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_dataProvider2.default.loadDataAndInitialize();
 
 var app = (0, _express2.default)();
 

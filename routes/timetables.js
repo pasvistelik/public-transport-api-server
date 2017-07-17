@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
+import DataProvider from '../modules/public-transport-server-code/dataProvider';
+
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-    res.send(global.allTimetablesJSON);
+router.get('/', async function(req, res, next) {
+    await DataProvider.loadDataAndInitialize();
+    res.send(DataProvider.getAllTimetablesJSON());
 });
 
 module.exports = router;
