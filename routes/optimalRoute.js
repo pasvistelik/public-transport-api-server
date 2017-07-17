@@ -1,7 +1,8 @@
-﻿var express = require('express');
+﻿import express from 'express';
 var router = express.Router();
 
 var OptimalRoutesCollection = require('../modules/optimalRoutesCollection');
+//import OptimalRoutesCollection from 'optimalRoutesCollection';
 
 
 router.get('/', function (req, res, next) {

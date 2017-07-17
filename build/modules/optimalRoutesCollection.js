@@ -1,24 +1,34 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _createClass2 = require('babel-runtime/helpers/createClass');
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var IgnoringFragments = require('./ignoringFragments');
 var OptimalRoute = require('./optimalRoute');
 var OptimalWay = require('./optimalWay');
 
 var OptimalRoutesCollection = function (_Array) {
-    _inherits(OptimalRoutesCollection, _Array);
+    (0, _inherits3.default)(OptimalRoutesCollection, _Array);
 
     function OptimalRoutesCollection(nowPos, needPos, time, types, speed, dopTimeMinutes) {
-        _classCallCheck(this, OptimalRoutesCollection);
+        (0, _classCallCheck3.default)(this, OptimalRoutesCollection);
 
-        var _this = _possibleConstructorReturn(this, (OptimalRoutesCollection.__proto__ || Object.getPrototypeOf(OptimalRoutesCollection)).call(this));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (OptimalRoutesCollection.__proto__ || Object.getPrototypeOf(OptimalRoutesCollection)).call(this));
 
         _this.push(new OptimalRoute(nowPos, needPos, time, types, speed, dopTimeMinutes));
 
@@ -58,7 +68,7 @@ var OptimalRoutesCollection = function (_Array) {
         return _this;
     }
 
-    _createClass(OptimalRoutesCollection, [{
+    (0, _createClass3.default)(OptimalRoutesCollection, [{
         key: 'getOptimalWays',
         value: function getOptimalWays() {
             var result = new Array();
@@ -85,7 +95,6 @@ var OptimalRoutesCollection = function (_Array) {
             return null;
         }
     }]);
-
     return OptimalRoutesCollection;
 }(Array);
 

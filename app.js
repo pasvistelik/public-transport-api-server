@@ -1,18 +1,18 @@
 ﻿import express from 'express';
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+import path from 'path';
+import favicon from 'serve-favicon';
+import logger from 'morgan';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 
-var initialize = require('./modules/initialize');
+import initialize from './modules/initialize';
 
-var my_stations = require('./routes/stations');
-var my_routes = require('./routes/routes');
-var my_timetables = require('./routes/timetables');
-var optimalRoute = require('./routes/optimalRoute');
+import my_stations from './routes/stations';
+import my_routes from './routes/routes';
+import my_timetables from './routes/timetables';
+import optimalRoute from './routes/optimalRoute';
 
 var app = express();
 

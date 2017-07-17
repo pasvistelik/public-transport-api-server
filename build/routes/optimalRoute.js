@@ -1,9 +1,16 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
+var _express = require('express');
+
+var _express2 = _interopRequireDefault(_express);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var router = _express2.default.Router();
 
 var OptimalRoutesCollection = require('../modules/optimalRoutesCollection');
+//import OptimalRoutesCollection from 'optimalRoutesCollection';
+
 
 router.get('/', function (req, res, next) {
 
