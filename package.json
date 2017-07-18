@@ -25,9 +25,8 @@
     "debug": "~2.6.0",
     "express": "~4.14.1",
     "morgan": "~1.7.0",
-    "node-fetch": "^1.6.3",
+    "public-transport-server-code": "git+https://github.com/pasvistelik/public-transport-server-code.git",
     "pug": "~2.0.0-beta10",
-    "serve-favicon": "~2.3.2",
-    "public-transport-server-code": "https://github.com/pasvistelik/public-transport-server-code"
+    "serve-favicon": "~2.3.2"
   }
 }
