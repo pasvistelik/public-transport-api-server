@@ -15,13 +15,13 @@ https://github.com/pasvistelik/myapp
 
 Server API demo links: 
 
-https://ptp-97126.app.xervo.io/routes
+https://public-transport-api-server.herokuapp.com/routes
 
-https://ptp-97126.app.xervo.io/stations
+https://public-transport-api-server.herokuapp.com/stations
 
-https://ptp-97126.app.xervo.io/timetables
+https://public-transport-api-server.herokuapp.com/timetables
 
-https://ptp-97126.app.xervo.io/OptimalRoute?from=53.7082,23.8029&to=53.6568,23.8568&startTime=20:35&dopTimeMinutes=2&goingSpeed=5&transportTypes=bus,trolleybus
+https://public-transport-api-server.herokuapp.com/OptimalRoute?from=53.7082,23.8029&to=53.6568,23.8568&startTime=20:35&dopTimeMinutes=2&goingSpeed=5&transportTypes=bus,trolleybus
 # Клиентская часть
 https://github.com/pasvistelik/react-app
 
