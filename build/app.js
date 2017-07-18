@@ -28,7 +28,7 @@ var _cors = require('cors');
 
 var _cors2 = _interopRequireDefault(_cors);
 
-var _dataProvider = require('./modules/public-transport-server-code/dataProvider');
+var _dataProvider = require('public-transport-server-code/lib/dataProvider');
 
 var _dataProvider2 = _interopRequireDefault(_dataProvider);
 

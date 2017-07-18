@@ -1,8 +1,8 @@
 ﻿import express from 'express';
 var router = express.Router();
 
-import DataProvider from '../modules/public-transport-server-code/dataProvider';
-import AppServer from '../modules/public-transport-server-code/server';
+import DataProvider from 'public-transport-server-code/lib/dataProvider';
+import AppServer from 'public-transport-server-code';
 
 
 router.get('/', async function (req, res, next) {

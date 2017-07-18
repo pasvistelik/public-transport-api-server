@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-import DataProvider from '../modules/public-transport-server-code/dataProvider';
+import DataProvider from 'public-transport-server-code/lib/dataProvider';
 
 /* GET users listing. */
 router.get('/', async function(req, res, next) {

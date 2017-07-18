@@ -8,13 +8,13 @@ var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
 
-var _dataProvider = require('../modules/public-transport-server-code/dataProvider');
+var _dataProvider = require('public-transport-server-code/lib/dataProvider');
 
 var _dataProvider2 = _interopRequireDefault(_dataProvider);
 
-var _server = require('../modules/public-transport-server-code/server');
+var _publicTransportServerCode = require('public-transport-server-code');
 
-var _server2 = _interopRequireDefault(_server);
+var _publicTransportServerCode2 = _interopRequireDefault(_publicTransportServerCode);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -96,7 +96,7 @@ router.get('/', function _callee(req, res, next) {
 
 
                                         _context.next = 29;
-                                        return _regenerator2.default.awrap(_server2.default.findWays(fromPositionStr, toPositionStr, myStartTimeStr, my_dopTimeMinutes, my_speed, typesStr));
+                                        return _regenerator2.default.awrap(_publicTransportServerCode2.default.findWays(fromPositionStr, toPositionStr, myStartTimeStr, my_dopTimeMinutes, my_speed, typesStr));
 
                                 case 29:
                                         findedOptimalWays = _context.sent;

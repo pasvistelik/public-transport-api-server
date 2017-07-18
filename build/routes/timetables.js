@@ -4,7 +4,7 @@ var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _dataProvider = require('../modules/public-transport-server-code/dataProvider');
+var _dataProvider = require('public-transport-server-code/lib/dataProvider');
 
 var _dataProvider2 = _interopRequireDefault(_dataProvider);
 
