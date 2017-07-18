@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "private": true,
   "scripts": {
-    "build": "npm update && rimraf build/ && babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./*.cmd,./*.ini --copy-files",
+    "build": "npm update --save && rimraf build/ && babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./*.cmd,./*.ini --copy-files",
     "start": "npm run build && node build/bin/www",
     "babel-version": "babel --version"
   },
