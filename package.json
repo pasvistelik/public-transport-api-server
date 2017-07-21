@@ -27,6 +27,8 @@
     "express": "~4.14.1",
     "morgan": "~1.7.0",
     "public-transport-server-code": "git+https://github.com/pasvistelik/public-transport-server-code.git",
+    "public-transport-initialize-data": "https://github.com/pasvistelik/public-transport-initialize-data",
+    "public-transport-find-optimal-ways": "https://github.com/pasvistelik/public-transport-find-optimal-ways",
     "pug": "~2.0.0-beta10",
     "serve-favicon": "~2.3.2"
   }
