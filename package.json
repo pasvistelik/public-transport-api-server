@@ -1,6 +1,6 @@
 {
   "name": "myapp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "scripts": {
     "build": "rimraf build/ && babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./*.cmd,./*.ini --copy-files",
