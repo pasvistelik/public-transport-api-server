@@ -11,8 +11,9 @@ Object.defineProperty(exports, "__esModule", {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function getNextStation(currentStation) {
-    for (var j = 0, thisStations = this.stations[0]; j <= 1; thisStations = this.stations[j = 1]) {
-        for (var t = 0, nn = thisStations.length; t < nn; t++) {
+    for (var j = 0, thisStations = this.stations[0], nn = thisStations.length - 1; j <= 1; thisStations = this.stations[j = 1], nn = thisStations.length - 1) {
+        if (thisStations[nn] === currentStation) return null;
+        for (var t = 0; t < nn; t++) {
             if (thisStations[t] === currentStation) {
                 if (t + 1 !== nn) return thisStations[t + 1];else return null;
             }
@@ -22,10 +23,9 @@ function getNextStation(currentStation) {
 }
 function getPreviousStation(currentStation) {
     for (var j = 0, thisStations = this.stations[0]; j <= 1; thisStations = this.stations[j = 1]) {
-        for (var t = 0, nn = thisStations.length; t < nn; t++) {
-            if (thisStations[t] === currentStation) {
-                if (t !== 0) return thisStations[t - 1];else return null;
-            }
+        if (thisStations[0] === currentStation) return null;
+        for (var t = 1, nn = thisStations.length; t < nn; t++) {
+            if (thisStations[t] === currentStation) return thisStations[t - 1];
         }
     }
     return null;
@@ -232,6 +232,19 @@ function initialize(allStations, allRoutes, allTimetables) {
     for (var _i2 = 0, _n2 = allTimetables.length, timetable = allTimetables[0]; _i2 < _n2; timetable = allTimetables[++_i2]) {
         timetable.findTimeAfter = findTimeAfter;
         timetable.findTimeBefore = findTimeBefore;
+
+        /////////////////* Далее "костыль" для не отсортированного конвертерами времени: */////////////////////////////
+        for (var kkk = 0, mnkk = timetable.table.length, t = timetable.table[0]; kkk < mnkk; t = timetable.table[++kkk]) {
+            for (var iik = 0, mnii = t.times.length, st = t.times[0], stTime; iik < mnii - 1; st = t.times[++iik]) {
+                if (st.hour > t.times[iik + 1].hour) {
+                    for (st = t.times[++iik]; iik < mnii; st = t.times[++iik]) {
+                        st.hour += 24;
+                    }
+                    break;
+                }
+            }
+        }
+        /////////////////* Конец "костыля" для не отсортированного конвертерами времени. */////////////////////////////
     }
 
     console.log("Initialized. Time = " + (Date.now() - startInitializingMoment) + " ms.");
