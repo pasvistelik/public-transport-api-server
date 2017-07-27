@@ -1,9 +1,5 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
@@ -56,59 +52,49 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = (0, _express2.default)();
 
-new Promise(function _callee(resolve, reject) {
-    return _regenerator2.default.async(function _callee$(_context) {
-        while (1) {
-            switch (_context.prev = _context.next) {
-                case 0:
-                    _context.next = 2;
-                    return _regenerator2.default.awrap(_dataProvider2.default.loadDataAndInitialize());
+// view engine setup
+app.set('views', _path2.default.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
-                case 2:
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use((0, _cors2.default)());
+app.use((0, _morgan2.default)('dev'));
+app.use(_bodyParser2.default.json());
+app.use(_bodyParser2.default.urlencoded({ extended: false }));
+app.use((0, _cookieParser2.default)());
+app.use(_express2.default.static(_path2.default.join(__dirname, 'public')));
 
-                    // view engine setup
-                    app.set('views', _path2.default.join(__dirname, 'views'));
-                    app.set('view engine', 'pug');
+/*(new Promise(async function(resolve, reject) {
+    await DataProvider.loadDataAndInitialize();
+}));*/
 
-                    // uncomment after placing your favicon in /public
-                    //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-                    app.use((0, _cors2.default)());
-                    app.use((0, _morgan2.default)('dev'));
-                    app.use(_bodyParser2.default.json());
-                    app.use(_bodyParser2.default.urlencoded({ extended: false }));
-                    app.use((0, _cookieParser2.default)());
-                    app.use(_express2.default.static(_path2.default.join(__dirname, 'public')));
+/*app.use(async function () {
+    await DataProvider.loadDataAndInitialize();
+})*/
 
-                    app.use('/stations', _stations2.default);
-                    app.use('/routes', _routes2.default);
-                    app.use('/timetables', _timetables2.default);
+app.use('/stations', _stations2.default);
+app.use('/routes', _routes2.default);
+app.use('/timetables', _timetables2.default);
 
-                    app.use('/optimalRoute', _optimalRoute2.default);
+app.use('/optimalRoute', _optimalRoute2.default);
 
-                    // catch 404 and forward to error handler
-                    app.use(function (req, res, next) {
-                        var err = new Error('Not Found');
-                        err.status = 404;
-                        next(err);
-                    });
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
-                    // error handler
-                    app.use(function (err, req, res, next) {
-                        // set locals, only providing error in development
-                        res.locals.message = err.message;
-                        res.locals.error = req.app.get('env') === 'development' ? err : {};
+// error handler
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-                        // render the error page
-                        res.status(err.status || 500);
-                        res.render('error');
-                    });
-
-                case 16:
-                case 'end':
-                    return _context.stop();
-            }
-        }
-    }, null, this);
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;

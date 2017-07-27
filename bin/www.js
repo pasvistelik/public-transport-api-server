@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+import DataProvider from 'public-transport-server-code/lib/dataProvider';
 
 var app = require('../app');
 var debug = require('debug')('myapp:server');
@@ -25,9 +26,13 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+(new Promise(async function(resolve, reject) {
+  await DataProvider.loadDataAndInitialize();
+
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+}));
 
 /**
  * Normalize a port into a number, string, or false.

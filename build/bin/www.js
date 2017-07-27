@@ -1,10 +1,22 @@
 #!/usr/bin/env node
+'use strict';
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _dataProvider = require('public-transport-server-code/lib/dataProvider');
+
+var _dataProvider2 = _interopRequireDefault(_dataProvider);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var app = require('../app');
 
 /**
  * Module dependencies.
  */
 
-var app = require('../app');
 var debug = require('debug')('myapp:server');
 var http = require('http');
 
@@ -25,9 +37,27 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+new Promise(function _callee(resolve, reject) {
+  return _regenerator2.default.async(function _callee$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return _regenerator2.default.awrap(_dataProvider2.default.loadDataAndInitialize());
+
+        case 2:
+
+          server.listen(port);
+          server.on('error', onError);
+          server.on('listening', onListening);
+
+        case 5:
+        case 'end':
+          return _context.stop();
+      }
+    }
+  }, null, this);
+});
 
 /**
  * Normalize a port into a number, string, or false.
@@ -58,9 +88,7 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -83,8 +111,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
