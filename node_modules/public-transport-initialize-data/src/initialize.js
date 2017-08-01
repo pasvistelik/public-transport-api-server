@@ -46,18 +46,13 @@ function findTimeAfter(time) {
     for (let kkk = 0, mnkk = this.table.length, t = this.table[0]; kkk < mnkk; t = this.table[++kkk]) {
         if (t.days.includes(day)) {
             
-            //TODO: Здесь можно ускорить поиск, поскольку массив t.times отсортирован по возрастанию.
-            /*for (let iik = 0, mnii = t.times.length, st = t.times[0], stTime; iik < mnii; st = t.times[++iik]) {
-                stTime = st.hour * 3600 + st.minute * 60;
-                if (stTime >= time) {
-                    return stTime - time;
-                }
-            }*/
             let findedTime = binaryFind(t.times, function(element, index, array){
-                let stTime = element.hour * 3600 + element.minute * 60, previous = array[index - 1];
-                if (stTime >= time && (previous == null || previous.hour * 3600 + previous.minute * 60 < time)) return 0;
-                else if (stTime >= time) return 1;
-                else return -1;
+                let previous = array[index - 1];
+                if (element.hour * 3600 + element.minute * 60 >= time){
+                    if (previous == null || previous.hour * 3600 + previous.minute * 60 < time) return 0;
+                    return 1;
+                }
+                return -1;
             });
             if (findedTime != null) return findedTime.hour * 3600 + findedTime.minute * 60 - time;
 
@@ -83,13 +78,15 @@ function findTimeBefore(time) {
     for (let kkk = 0, mnkk = this.table.length, t = this.table[0], ok = false, st; kkk < mnkk; t = this.table[++kkk]) {
         if (t.days.includes(day)) {
 
-            //TODO: Здесь можно ускорить поиск, поскольку массив t.times отсортирован по возрастанию.
-            for (let iik = t.times.length - 1, stt = t.times[iik], stTime; iik >= 0; stt = t.times[--iik]) {
-                stTime = stt.hour * 3600 + stt.minute * 60;
-                if (stTime <= time) {
-                    return stTime - time;
+            let findedTime = binaryFind(t.times, function(element, index, array){
+                let next = array[index + 1];
+                if (element.hour * 3600 + element.minute * 60 <= time){
+                    if  (next == null || next.hour * 3600 + next.minute * 60 > time) return 0;
+                    return 1;
                 }
-            }
+                return -1;
+            });
+            if (findedTime != null) return findedTime.hour * 3600 + findedTime.minute * 60 - time;
 
             //TODO: Здесь следует перейти к расписанию предыдущего дня и искать там.
             if (t.times.length !== 0) return t.times[t.times.length - 1].hour * 3600 + t.times[t.times.length - 1].minute * 60 - 86400 - time;

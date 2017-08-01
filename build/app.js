@@ -50,6 +50,9 @@ var _dataProvider2 = _interopRequireDefault(_dataProvider);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+require("babel-core/register");
+require("babel-polyfill");
+
 var app = (0, _express2.default)();
 
 // view engine setup

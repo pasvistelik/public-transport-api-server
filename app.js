@@ -13,7 +13,8 @@ import optimalRoute from './routes/optimalRoute';
 
 import DataProvider from 'public-transport-server-code/lib/dataProvider';
 
-
+require("babel-core/register");
+require("babel-polyfill");
 
 var app = express();
 

@@ -1,9 +1,5 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
@@ -22,7 +18,7 @@ var router = _express2.default.Router();
 
 router.get('/', function _callee(req, res, next) {
         var strToCoords, strToSeconds, fromPosition, toPosition, myStartTime, my_speed, my_dopTimeMinutes, types, startInitializingMoment, tmpMyDate, fromPositionStr, toPositionStr, typesStr, i, n, hour, minute, myStartTimeStr, findedOptimalWays;
-        return _regenerator2.default.async(function _callee$(_context) {
+        return regeneratorRuntime.async(function _callee$(_context) {
                 while (1) {
                         switch (_context.prev = _context.next) {
                                 case 0:
@@ -43,7 +39,7 @@ router.get('/', function _callee(req, res, next) {
                                         };
 
                                         _context.next = 4;
-                                        return _regenerator2.default.awrap(_dataProvider2.default.loadDataAndInitialize());
+                                        return regeneratorRuntime.awrap(_dataProvider2.default.loadDataAndInitialize());
 
                                 case 4:
                                         fromPosition = strToCoords(req.query.from);
@@ -96,7 +92,7 @@ router.get('/', function _callee(req, res, next) {
 
 
                                         _context.next = 29;
-                                        return _regenerator2.default.awrap(_publicTransportServerCode2.default.findWays(fromPositionStr, toPositionStr, myStartTimeStr, my_dopTimeMinutes, my_speed, typesStr));
+                                        return regeneratorRuntime.awrap(_publicTransportServerCode2.default.findWays(fromPositionStr, toPositionStr, myStartTimeStr, my_dopTimeMinutes, my_speed, typesStr));
 
                                 case 29:
                                         findedOptimalWays = _context.sent;

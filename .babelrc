@@ -1,15 +1,8 @@
 {
   "presets": [
-    "es2015",
-    "node6"
+    "es2015"
   ],
   "plugins": [
-    "transform-class-properties", 
-    "babel-polyfill", 
-    "transform-regenerator",
-    ["transform-runtime", {
-      "polyfill": false,
-      "regenerator": true
-    }]
+    "transform-regenerator"
   ]
 }
