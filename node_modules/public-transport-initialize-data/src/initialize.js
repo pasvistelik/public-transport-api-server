@@ -82,9 +82,9 @@ function findTimeBefore(time) {
                 let next = array[index + 1];
                 if (element <= time){
                     if  (next == null || next > time) return 0;
-                    return 1;
+                    return -1;
                 }
-                return -1;
+                return 1;
             });
             if (findedTime != null) return findedTime - time;
 

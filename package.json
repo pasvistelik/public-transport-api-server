@@ -18,7 +18,7 @@
     "babel-preset-node6": "^11.0.0",
     "node-fetch": "^1.7.1",
     "rimraf": "^2.6.1",
-    "geo-coords-distance":"^2.0.5"
+    "geo-coords-distance": "^2.0.5"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -26,9 +26,9 @@
     "debug": "~2.6.0",
     "express": "~4.14.1",
     "morgan": "~1.7.0",
+    "public-transport-find-optimal-ways": "git+https://github.com/pasvistelik/public-transport-find-optimal-ways.git",
+    "public-transport-initialize-data": "git+https://github.com/pasvistelik/public-transport-initialize-data.git",
     "public-transport-server-code": "git+https://github.com/pasvistelik/public-transport-server-code.git",
-    "public-transport-initialize-data": "https://github.com/pasvistelik/public-transport-initialize-data",
-    "public-transport-find-optimal-ways": "https://github.com/pasvistelik/public-transport-find-optimal-ways",
     "pug": "~2.0.0-beta10",
     "serve-favicon": "~2.3.2"
   }
