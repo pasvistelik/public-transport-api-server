@@ -37,11 +37,12 @@ function getTimetable(station) {
     return null;
 }
 function findTimeAfter(time) {
-    var dateTmp = new Date();
+    /*var dateTmp = new Date();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     dateTmp.setMinutes(0);
     dateTmp.setHours(0);
     dateTmp.setSeconds(time);
-    var day = dateTmp.getDay();
+    var day = dateTmp.getDay();*/
+    var day = (new Date()).getDay();
     
     for (let kkk = 0, mnkk = this.table.length, t = this.table[0]; kkk < mnkk; t = this.table[++kkk]) {
         if (t.days.includes(day)) {
@@ -70,11 +71,13 @@ function findTimeAfter(time) {
     return 2160000000;
 }
 function findTimeBefore(time) {
-    var dateTmp = new Date();
+    /*var dateTmp = new Date();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     dateTmp.setMinutes(0);
     dateTmp.setHours(0);
     dateTmp.setSeconds(time);
-    var day = dateTmp.getDay();
+    var day = dateTmp.getDay();*/
+    var day = (new Date()).getDay();
+
     for (let kkk = 0, mnkk = this.table.length, t = this.table[0], ok = false, st; kkk < mnkk; t = this.table[++kkk]) {
         if (t.days.includes(day)) {
 
