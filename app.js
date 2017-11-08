@@ -9,6 +9,7 @@ import cors from 'cors';
 import my_stations from './routes/stations';
 import my_routes from './routes/routes';
 import my_timetables from './routes/timetables';
+import my_vehicles from './routes/vehicles';
 import optimalRoute from './routes/optimalRoute';
 
 import DataProvider from 'public-transport-server-code/lib/dataProvider';
@@ -44,6 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/stations', my_stations);
 app.use('/routes', my_routes);
 app.use('/timetables', my_timetables);
+app.use('/vehicles', my_vehicles);
 
 app.use('/optimalRoute', optimalRoute);
 

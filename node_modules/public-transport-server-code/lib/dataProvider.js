@@ -14,6 +14,14 @@ var _publicTransportInitializeData = require('public-transport-initialize-data')
 
 var _publicTransportInitializeData2 = _interopRequireDefault(_publicTransportInitializeData);
 
+var _publicTransportGpsPositionsCollector = require('public-transport-gps-positions-collector');
+
+var _publicTransportGpsPositionsCollector2 = _interopRequireDefault(_publicTransportGpsPositionsCollector);
+
+var _grodnoTransportGpsPositionsScraper = require('grodno-transport-gps-positions-scraper');
+
+var _grodnoTransportGpsPositionsScraper2 = _interopRequireDefault(_grodnoTransportGpsPositionsScraper);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -30,8 +38,10 @@ var DataProvider = function () {
         value: function getAllStations() {
             return DataProvider.allStations;
         }
+        //static allVehiclesJSON = null;
 
-        //static updatingFromServerInterval = 5000;
+
+        //static updatingFromServerIntervalMiliseconds = 5000;
 
     }, {
         key: 'getAllRoutes',
@@ -42,6 +52,11 @@ var DataProvider = function () {
         key: 'getAllTimetables',
         value: function getAllTimetables() {
             return DataProvider.allTimetables;
+        }
+    }, {
+        key: 'getAllVehicles',
+        value: function getAllVehicles() {
+            return DataProvider.allVehicles;
         }
     }, {
         key: 'getAllStationsJSON',
@@ -59,6 +74,24 @@ var DataProvider = function () {
             return DataProvider.allTimetablesJSON;
         }
     }, {
+        key: 'getAllVehiclesJSON',
+        value: function getAllVehiclesJSON() {
+            var result = [];
+            for (var i = 0, n = DataProvider.allVehicles.length, currentVehicle = DataProvider.allVehicles[0]; i < n; currentVehicle = DataProvider.allVehicles[++i]) {
+                result.push({
+                    globalId: currentVehicle.globalId,
+                    routeId: currentVehicle.route.hashcode,
+                    lat: currentVehicle.lat,
+                    lng: currentVehicle.lng,
+                    timestamp: currentVehicle.timestamp,
+                    speedInLastMoment: currentVehicle.speedInLastMoment
+                    //wayId: currentVehicle.way,
+                    //tripId: currentVehicle.trip
+                });
+            }
+            return result; //DataProvider.allVehiclesJSON;
+        }
+    }, {
         key: 'loadDataAndInitialize',
         value: function loadDataAndInitialize() {
             return regeneratorRuntime.async(function loadDataAndInitialize$(_context) {
@@ -66,7 +99,7 @@ var DataProvider = function () {
                     switch (_context.prev = _context.next) {
                         case 0:
                             if (DataProvider.loadingStarted) {
-                                _context.next = 5;
+                                _context.next = 10;
                                 break;
                             }
 
@@ -76,12 +109,23 @@ var DataProvider = function () {
                             return regeneratorRuntime.awrap(DataProvider.loadDataOnly());
 
                         case 4:
-
-                            if (DataProvider.allStationsLoaded && DataProvider.allRoutesLoaded && DataProvider.allTimetablesLoaded) {
-                                (0, _publicTransportInitializeData2.default)(DataProvider.allStations, DataProvider.allRoutes, DataProvider.allTimetables);
+                            if (!(DataProvider.allStationsLoaded && DataProvider.allRoutesLoaded && DataProvider.allTimetablesLoaded)) {
+                                _context.next = 10;
+                                break;
                             }
 
-                        case 5:
+                            (0, _publicTransportInitializeData2.default)(DataProvider.allStations, DataProvider.allRoutes, DataProvider.allTimetables);
+
+                            _publicTransportGpsPositionsCollector2.default.startCollect();
+                            _context.next = 9;
+                            return regeneratorRuntime.awrap(_publicTransportGpsPositionsCollector2.default.use(_grodnoTransportGpsPositionsScraper2.default, DataProvider.allRoutes));
+
+                        case 9:
+                            //todo: не allRoutes, а те, что в Гродно...
+
+                            DataProvider.allVehicles = _publicTransportGpsPositionsCollector2.default.vehicles;
+
+                        case 10:
                         case 'end':
                             return _context.stop();
                     }
@@ -182,6 +226,7 @@ var DataProvider = function () {
 
 DataProvider.allStations = null;
 DataProvider.allRoutes = null;
+DataProvider.allVehicles = null;
 DataProvider.allTimetables = null;
 DataProvider.loadingStarted = false;
 DataProvider.allStationsLoaded = false;

@@ -40,6 +40,10 @@ var _timetables = require('./routes/timetables');
 
 var _timetables2 = _interopRequireDefault(_timetables);
 
+var _vehicles = require('./routes/vehicles');
+
+var _vehicles2 = _interopRequireDefault(_vehicles);
+
 var _optimalRoute = require('./routes/optimalRoute');
 
 var _optimalRoute2 = _interopRequireDefault(_optimalRoute);
@@ -79,6 +83,7 @@ app.use(_express2.default.static(_path2.default.join(__dirname, 'public')));
 app.use('/stations', _stations2.default);
 app.use('/routes', _routes2.default);
 app.use('/timetables', _timetables2.default);
+app.use('/vehicles', _vehicles2.default);
 
 app.use('/optimalRoute', _optimalRoute2.default);
 
