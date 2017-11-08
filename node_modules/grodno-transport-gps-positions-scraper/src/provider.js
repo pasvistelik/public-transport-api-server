@@ -66,7 +66,7 @@ class GrodnoPositionsScraper{
                 }
                 currentVehicle.lat = vehicle.lat / 1000000;
                 currentVehicle.lng = vehicle.lon / 1000000;
-                currentVehicle.timestamp = vehicle.lasttime;
+                currentVehicle.timestamp = (new Date(vehicle.lasttime+" GMT").toLocaleString('ru-RU', { timeZone: 'Europe/Minsk' })).toString();;
                 currentVehicle.localId = vehicle.id;
                 currentVehicle.speedInLastMoment = vehicle.speed;
                 currentVehicle.way = null;

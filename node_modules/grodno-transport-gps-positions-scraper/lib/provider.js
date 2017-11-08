@@ -213,7 +213,7 @@ var GrodnoPositionsScraper = function () {
 
                                                 case 4:
                                                     if (!(_i2 < _n2)) {
-                                                        _context.next = 22;
+                                                        _context.next = 23;
                                                         break;
                                                     }
 
@@ -232,7 +232,7 @@ var GrodnoPositionsScraper = function () {
                                                     }
 
                                                     console.log("Не найдена связь с маршрутом: " + vehicle.rid);
-                                                    return _context.abrupt('continue', 19);
+                                                    return _context.abrupt('continue', 20);
 
                                                 case 11:
                                                     currentVehicle = this.grodnoVehicles[parseInt(vehicle.id)] = {
@@ -242,7 +242,7 @@ var GrodnoPositionsScraper = function () {
                                                 case 12:
                                                     currentVehicle.lat = vehicle.lat / 1000000;
                                                     currentVehicle.lng = vehicle.lon / 1000000;
-                                                    currentVehicle.timestamp = vehicle.lasttime;
+                                                    currentVehicle.timestamp = new Date(vehicle.lasttime + " GMT").toLocaleString('ru-RU', { timeZone: 'Europe/Minsk' }).toString();;
                                                     currentVehicle.localId = vehicle.id;
                                                     currentVehicle.speedInLastMoment = vehicle.speed;
                                                     currentVehicle.way = null;
@@ -250,12 +250,12 @@ var GrodnoPositionsScraper = function () {
 
                                                     //console.log(currentVehicle);
 
-                                                case 19:
+                                                case 20:
                                                     vehicle = returnedVehicles[++_i2];
                                                     _context.next = 4;
                                                     break;
 
-                                                case 22:
+                                                case 23:
                                                 case 'end':
                                                     return _context.stop();
                                             }
