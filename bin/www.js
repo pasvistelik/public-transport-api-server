@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+import ApiConfig from '../config';
 import DataProvider from 'public-transport-server-code/lib/dataProvider';
 
 var app = require('../app');
@@ -26,13 +27,14 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-(new Promise(async function(resolve, reject) {
+(async function() {
+  DataProvider.useConfig(ApiConfig);
   await DataProvider.loadDataAndInitialize();
 
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);
-}));
+})();
 
 /**
  * Normalize a port into a number, string, or false.
@@ -60,7 +62,8 @@ function normalizePort(val) {
 
 function onError(error) {
   if (error.syscall !== 'listen') {
-    throw error;
+    //throw error;//!!!!!!!!!!!!!!
+    console.log(error);
   }
 
   var bind = typeof port === 'string'
@@ -78,7 +81,8 @@ function onError(error) {
       process.exit(1);
       break;
     default:
-      throw error;
+      //throw error;//!!!!!!!!!!!!!!
+      console.log(error);
   }
 }
 

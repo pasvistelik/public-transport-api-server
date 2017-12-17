@@ -1,4 +1,4 @@
 export default {
     
-    updatingInterval: 10000
+    updatingInterval: 5000
 };

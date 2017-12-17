@@ -12,8 +12,6 @@ import my_timetables from './routes/timetables';
 import my_vehicles from './routes/vehicles';
 import optimalRoute from './routes/optimalRoute';
 
-import DataProvider from 'public-transport-server-code/lib/dataProvider';
-
 require("babel-core/register");
 require("babel-polyfill");
 
@@ -31,14 +29,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-/*(new Promise(async function(resolve, reject) {
-    await DataProvider.loadDataAndInitialize();
-}));*/
-
-/*app.use(async function () {
-    await DataProvider.loadDataAndInitialize();
-})*/
 
 
 

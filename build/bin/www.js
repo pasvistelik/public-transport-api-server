@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 'use strict';
 
+var _config = require('../config');
+
+var _config2 = _interopRequireDefault(_config);
+
 var _dataProvider = require('public-transport-server-code/lib/dataProvider');
 
 var _dataProvider2 = _interopRequireDefault(_dataProvider);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var app = require('../app');
-
 /**
  * Module dependencies.
  */
-
+var app = require('../app');
 var debug = require('debug')('myapp:server');
 var http = require('http');
 
@@ -33,27 +35,28 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-new Promise(function _callee(resolve, reject) {
+(function _callee() {
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _context.next = 2;
+          _dataProvider2.default.useConfig(_config2.default);
+          _context.next = 3;
           return regeneratorRuntime.awrap(_dataProvider2.default.loadDataAndInitialize());
 
-        case 2:
+        case 3:
 
           server.listen(port);
           server.on('error', onError);
           server.on('listening', onListening);
 
-        case 5:
+        case 6:
         case 'end':
           return _context.stop();
       }
     }
   }, null, this);
-});
+})();
 
 /**
  * Normalize a port into a number, string, or false.
@@ -81,7 +84,8 @@ function normalizePort(val) {
 
 function onError(error) {
   if (error.syscall !== 'listen') {
-    throw error;
+    //throw error;//!!!!!!!!!!!!!!
+    console.log(error);
   }
 
   var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
@@ -97,7 +101,8 @@ function onError(error) {
       process.exit(1);
       break;
     default:
-      throw error;
+      //throw error;//!!!!!!!!!!!!!!
+      console.log(error);
   }
 }
 

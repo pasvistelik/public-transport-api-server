@@ -48,10 +48,6 @@ var _optimalRoute = require('./routes/optimalRoute');
 
 var _optimalRoute2 = _interopRequireDefault(_optimalRoute);
 
-var _dataProvider = require('public-transport-server-code/lib/dataProvider');
-
-var _dataProvider2 = _interopRequireDefault(_dataProvider);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 require("babel-core/register");
@@ -71,14 +67,6 @@ app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: false }));
 app.use((0, _cookieParser2.default)());
 app.use(_express2.default.static(_path2.default.join(__dirname, 'public')));
-
-/*(new Promise(async function(resolve, reject) {
-    await DataProvider.loadDataAndInitialize();
-}));*/
-
-/*app.use(async function () {
-    await DataProvider.loadDataAndInitialize();
-})*/
 
 app.use('/stations', _stations2.default);
 app.use('/routes', _routes2.default);

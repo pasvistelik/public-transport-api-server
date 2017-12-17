@@ -29,4 +29,37 @@ router.get('/', function _callee(req, res, next) {
     }, null, this);
 });
 
+router.get('/migrate', function _callee2(req, res, next) {
+    var tmpAllStations, result, i, n, item;
+    return regeneratorRuntime.async(function _callee2$(_context2) {
+        while (1) {
+            switch (_context2.prev = _context2.next) {
+                case 0:
+                    _context2.next = 2;
+                    return regeneratorRuntime.awrap(_dataProvider2.default.loadDataAndInitialize());
+
+                case 2:
+                    tmpAllStations = _dataProvider2.default.getAllStations();
+                    result = [];
+
+
+                    for (i = 0, n = tmpAllStations.length, item = tmpAllStations[0]; i < n; item = tmpAllStations[++i]) {
+                        result.push({
+                            lat: item.coords.lat,
+                            lng: item.coords.lng,
+                            name: item.name,
+                            tmp_station_hashcode: item.hashcode
+                        });
+                    }
+
+                    res.send(JSON.stringify(result));
+
+                case 6:
+                case 'end':
+                    return _context2.stop();
+            }
+        }
+    }, null, this);
+});
+
 module.exports = router;
