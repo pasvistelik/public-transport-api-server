@@ -86,7 +86,7 @@ function strToSeconds(str) {
     var hours = parseInt(tmp[0], 10);
     var minutes = parseInt(tmp[1], 10);
     var seconds = 0;
-    if (tmp[2]) parseInt(tmp[2], 10);
+    if (tmp[2]) seconds = parseInt(tmp[2], 10);
     if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) return 3600 * hours + 60 * minutes + seconds;else return undefined;
 }
 
