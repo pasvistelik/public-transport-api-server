@@ -76,14 +76,16 @@ export default class DataProvider {
         if(!DataProvider.loadingStarted){
             DataProvider.loadingStarted = true;
 
-            await TransportDatabase.useConnection(
-                {
-                    host     : AppConfig.databaseHost,
-                    user     : AppConfig.databaseUser,
-                    password : AppConfig.databasePassword,
-                    database : AppConfig.databaseName
-                }
-            );
+            if (AppConfig.databaseEnabled){
+                await TransportDatabase.useConnection(
+                    {
+                        host     : AppConfig.databaseHost,
+                        user     : AppConfig.databaseUser,
+                        password : AppConfig.databasePassword,
+                        database : AppConfig.databaseName
+                    }
+                );
+            }
 
             await DataProvider.loadDataOnly();
 
@@ -97,7 +99,8 @@ export default class DataProvider {
             }
 
             savingPositionsStarted = true;
-            continueSavingPositionsToDatabase();
+            
+            if (AppConfig.databaseEnabled) continueSavingPositionsToDatabase();
         }
     }
     static async loadDataOnly() {

@@ -116,13 +116,18 @@ var DataProvider = function () {
                     switch (_context.prev = _context.next) {
                         case 0:
                             if (DataProvider.loadingStarted) {
-                                _context.next = 14;
+                                _context.next = 15;
                                 break;
                             }
 
                             DataProvider.loadingStarted = true;
 
-                            _context.next = 4;
+                            if (!AppConfig.databaseEnabled) {
+                                _context.next = 5;
+                                break;
+                            }
+
+                            _context.next = 5;
                             return regeneratorRuntime.awrap(_publicTransportDatabase2.default.useConnection({
                                 host: AppConfig.databaseHost,
                                 user: AppConfig.databaseUser,
@@ -130,33 +135,34 @@ var DataProvider = function () {
                                 database: AppConfig.databaseName
                             }));
 
-                        case 4:
-                            _context.next = 6;
+                        case 5:
+                            _context.next = 7;
                             return regeneratorRuntime.awrap(DataProvider.loadDataOnly());
 
-                        case 6:
+                        case 7:
                             if (!(DataProvider.allStationsLoaded && DataProvider.allRoutesLoaded && DataProvider.allTimetablesLoaded)) {
-                                _context.next = 12;
+                                _context.next = 13;
                                 break;
                             }
 
                             (0, _publicTransportInitializeData2.default)(DataProvider.allStations, DataProvider.allRoutes, DataProvider.allTimetables);
 
                             _publicTransportGpsPositionsCollector2.default.startCollect();
-                            _context.next = 11;
+                            _context.next = 12;
                             return regeneratorRuntime.awrap(_publicTransportGpsPositionsCollector2.default.use(_grodnoTransportGpsPositionsScraper2.default, DataProvider.allRoutes));
 
-                        case 11:
+                        case 12:
                             //todo: не allRoutes, а те, что в Гродно...
 
                             DataProvider.allVehicles = _publicTransportGpsPositionsCollector2.default.vehicles;
 
-                        case 12:
+                        case 13:
 
                             savingPositionsStarted = true;
-                            continueSavingPositionsToDatabase();
 
-                        case 14:
+                            if (AppConfig.databaseEnabled) continueSavingPositionsToDatabase();
+
+                        case 15:
                         case 'end':
                             return _context.stop();
                     }
