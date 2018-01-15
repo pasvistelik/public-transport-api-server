@@ -1,7 +1,7 @@
 export default {
-    apiGetStationsUrl: "https://optimalway.github.io/json/stations.json?v=14", //"stations"
-    apiGetRoutesUrl: "https://optimalway.github.io/json/routes.json?v=14", //"routes"
-    apiGetTimetablesUrl: "https://optimalway.github.io/json/timetables.json?v=14", //"timetables"
+    apiGetStationsUrl: "https://optimalway.github.io/json/stations.json?v=15012018", //"stations"
+    apiGetRoutesUrl: "https://optimalway.github.io/json/routes.json?v=15012018", //"routes"
+    apiGetTimetablesUrl: "https://optimalway.github.io/json/timetables.json?v=15012018", //"timetables"
 
     databaseEnabled: false,
     databaseHost: 'localhost',
